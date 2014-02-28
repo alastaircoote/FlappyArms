@@ -28,7 +28,7 @@ gulp.task('copy-static', function() {
   gulp.src('./data/*.*').pipe(watch()).pipe(gulp.dest("./tmp/data")).pipe(livereload(server));
   
   gulp.src('./coffee/**/*.js').pipe(watch()).pipe(gulp.dest("./tmp/js/")).pipe(livereload(server));
-  gulp.src('./img/*').pipe(watch()).pipe(gulp.dest("./tmp/img/")).pipe(livereload(server));
+  gulp.src('./assets/**/*').pipe(watch()).pipe(gulp.dest("./tmp/assets/")).pipe(livereload(server));
   gulp.src('./fonts/*').pipe(watch()).pipe(gulp.dest("./tmp/fonts/")).pipe(livereload(server));
 });
 
@@ -63,7 +63,7 @@ gulp.task("build",function() {
   gulp.src('./data/*.*').pipe(awspublish.gzip()).pipe(gulp.dest("./build/data"))
   
   gulp.src('./coffee/**/*.js').pipe(uglify()).pipe(gulp.dest("./build/js/"))
-  gulp.src('./img/*').pipe(gulp.dest("./build/img/"))
+  gulp.src('./assets/**/*').pipe(gulp.dest("./build/assets/"))
   gulp.src('./fonts/*').pipe(gulp.dest("./build/fonts/"))
   gulp.src('./coffee/**/*.coffee').pipe(coffee()).pipe(uglify()).pipe(gulp.dest("./build" + '/js/'));
   gulp.src('./less/*').pipe(less()).pipe(gulp.dest("./build" + '/css/'));

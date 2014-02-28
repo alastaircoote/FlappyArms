@@ -1,3 +1,5 @@
+@import "reset.css";
+@import "main-game.css";
 body {
   position: absolute;
   overflow: hidden;
@@ -65,4 +67,58 @@ body.client {
 }
 body.client #gameholder {
   display: none;
+}
+#instruction-box {
+  background: #fff;
+  width: 90vmin;
+  height: 90vmin;
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  margin-top: -45vmin;
+  left: 50%;
+  margin-left: -45vmin;
+  border: solid 5px #ccc;
+  font-family: "Press Start 2P";
+  color: #000;
+  -webkit-transition: opacity 0.5 ease-in;
+}
+#instruction-box h1 {
+  margin: 5vmin 0;
+  text-align: center;
+  font-size: 10vmin;
+  font-weight: normal;
+}
+#instruction-box h3 {
+  text-align: center;
+  font-size: 15vmin;
+  margin: 8vmin;
+}
+#instruction-box p {
+  font-family: "Press Start 2P";
+  margin: 0 4vmin;
+  font-size: 2.5vmin;
+  text-align: center;
+  line-height: 1.2em;
+}
+#gamecontainer,
+#instruction-box {
+  display: none;
+}
+#howtoplay {
+  display: none;
+}
+.signals {
+  text-align: center;
+  margin-top: 6vmin;
+}
+.signals .signal {
+  width: 20vmin;
+  height: 20vmin;
+  border-radius: 10vmin;
+  background: red;
+  display: inline-block;
+}
+.signals .signal.active {
+  background: green;
 }

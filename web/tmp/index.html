@@ -5,8 +5,13 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
         <link rel="stylesheet" href="css/main.css" type="text/css"/>
+        <script src="js/libs/modernizr.js"></script>
+       <link href='http://fonts.googleapis.com/css?family=Press+Start+2P|Happy+Monkey' rel='stylesheet' type='text/css'>
     </head>
     <body>
+    <script src="js/game/buzz.min.js"></script>
+    <script src="js/libs/require.js" data-main="js/main.js"></script>
+    <!--
     <script src="js/modernizr.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="js/gyro.js"></script>
@@ -24,20 +29,56 @@
         } else {
             comm.server();
         }
-    </script>
-<div id="gameholder">
-    <div style="position:fixed; top:100%; height: 0px;">
-    <div style = "position:relative;"></div>
+    </script>-->
+<div id="gamecontainer">
+         <div id="gamescreen">
+            <div id="sky" class="animated">
+               <div id="flyarea">
+                  <div id="ceiling" class="animated"></div>
+                  <!-- This is the flying and pipe area container -->
+                  <div id="player" class="bird animated"></div>
+                  
+                  <div id="bigscore"></div>
+                  
+                  <div id="splash"></div>
+                  
+                  <div id="scoreboard">
+                     <div id="medal"></div>
+                     <div id="currentscore"></div>
+                     <div id="highscore"></div>
+                     <div id="replay"><img src="assets/replay.png" alt="replay"></div>
+                  </div>
+                  
+                  <!-- Pipes go here! -->
+               </div>
+            </div>
+            <div id="land" class="animated"><div id="debug"></div></div>
+         </div>
+      </div>
+
+  <div id="instruction-box">
+    <h1>Flappy Arms</h1>
+    <div id="intro">
+    <p>You thought Flappy Birds was annoying? Try flapping your arms while you do it. All you need to do is pull 
+      out your phone, go to this web site and enter:</p>
+      <h3 id="numbers">&nbsp;</h3>
+      <p>Blah</p>
+    </div>
+    <div id="howtoplay">
+      <p>OK, you're connected. Make sure you have at least one finger touching the your phone screen (don't put it
+        into standby!) and stretch your arms out... and get flapping.</p>
+        <p>Flap successfully three times and the game will start.</p>
+        <div class="signals">
+          <div class="signal" id="signal1"></div>
+          <div class="signal" id="signal2"></div>
+          <div class="signal" id="signal3"></div>
+        </div>
+    </div>
   </div>
 
-  <div id ="game-over-overlay" style="display:block;"></div>
-  <div id ="game-over" style="display:block;">
-    <h1>GAME OVER</h1>
-    <h1 id="score"></h1>
-  </div>
 
-  <canvas tabindex="1"></canvas>
 </div>
+<!--
   <script src="js/libs/underscore-min.js"></script>
   <script src="js/libs/resources.js"></script>
   <script src="js/game/sprite.js"></script>
@@ -47,5 +88,6 @@
   <script src="js/game/obstacle.js"></script>
   <script src="js/game/bird.js"></script>
   <script src="js/game/birdie.js"></script>
+-->
     </body>
 </html>
