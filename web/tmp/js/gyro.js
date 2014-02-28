@@ -106,9 +106,9 @@
 
             window.addEventListener('devicemotion', function(e) {
                 features.push('devicemotion');
-                measurements.x = e.accelerationIncludingGravity.x - calibration.x;
-                measurements.y = e.accelerationIncludingGravity.y - calibration.y;
-                measurements.z = e.accelerationIncludingGravity.z - calibration.z;
+                measurements.x = e.acceleration.x - calibration.x;
+                measurements.y = e.acceleration.y - calibration.y;
+                measurements.z = e.acceleration.z - calibration.z;
             }, true);
 
             window.addEventListener('deviceorientation', function(e) {

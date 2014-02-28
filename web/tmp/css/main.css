@@ -1,0 +1,68 @@
+body {
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+#gameholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#game-over,
+#game-over-overlay {
+  margin: auto;
+  width: 640px;
+  height: 480px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: none;
+}
+#game-over-overlay {
+  background-color: black;
+  opacity: .5;
+}
+#game-over {
+  height: 200px;
+  text-align: center;
+  color: white;
+}
+#game-over h1 {
+  font-size: 3em;
+  font-family: sans-serif;
+}
+#game-over button {
+  font-size: 1.5em;
+}
+canvas {
+  display: block;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+body.client {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: red;
+}
+body.client #gameholder {
+  display: none;
+}

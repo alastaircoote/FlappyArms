@@ -17,7 +17,7 @@ io.sockets.on 'connection', (socket) ->
 
     socket.on "get-id", () ->
         entry = savedSockets.filter((s) => s.socket.id == this.id)[0]
-        code = Math.round(Math.random() * 1000)
+        code = 1# Math.round(Math.random() * 1000)
         while savedSockets.filter((s) -> s.hostCode == code).length > 0
             # Get new ID
             code = Math.round(Math.random() * 1000)
@@ -32,8 +32,11 @@ io.sockets.on 'connection', (socket) ->
         host.socket.emit "got-client"
         this.emit "got-host"
 
-        socket.on "toucherated", ->
+        socket.on "send", (data) ->
             #entry = savedSockets.filter((s) => s.client?.id == this.id)[0]
-            socket.host.emit "touched"
+            socket.host.emit "receive", data
+
+        this.host.on "send", (data) ->
+            socket.emit "receive", data
 
     socket.on "disconnect", removeSocket

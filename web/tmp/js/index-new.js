@@ -1,5 +1,5 @@
 (function() {
-  var avg, gyro, isOn, lastFive, maxZ, minZ, old, table;
+  var avg, gyro, isOn, lastFive, lastFlap, maxZ, minZ, old, table;
 
   gyro = window.returnExports;
 
@@ -29,15 +29,23 @@
 
   minZ = 0;
 
-  document.ontouchstart = function() {
+  lastFlap = 0;
+
+  document.ontouchstart = function(e) {
+    console.log(e.target);
+    e.stopPropagation();
+    if (e.target === document.body) {
+      e.preventDefault();
+    }
+    if (e.touches.length > 1) {
+      return;
+    }
+    console.log("touchstart");
     maxZ = 0;
     minZ = 0;
     return gyro.startTracking(function(o) {
       var avgVals, rounded;
       lastFive.push(o);
-      if (lastFive.length < 5) {
-        return;
-      }
       avgVals = {
         x: avg(lastFive.map(function(o) {
           return o.x;
@@ -55,9 +63,12 @@
         y: Math.round(avgVals.y),
         z: Math.round(avgVals.z)
       };
-      if ((old != null ? old.z : void 0) !== rounded.z) {
-        console.log(rounded);
-      }
+      rounded = {
+        x: Math.round(o.x),
+        y: Math.round(o.y),
+        z: Math.round(o.z)
+      };
+      console.log(rounded.z);
       old = rounded;
       if (rounded.z < minZ) {
         minZ = rounded.z;
@@ -67,7 +78,15 @@
       }
       if (rounded.z >= -minZ) {
         if (minZ < -3) {
-          navigator.vibrate(100);
+          if (Date.now() - lastFlap < 200) {
+            return;
+          }
+          lastFlap = Date.now();
+          console.log("flapperated");
+          $("body").trigger("flap");
+          if (navigator.vibrate) {
+            navigator.vibrate(100);
+          }
         }
         maxZ = 0;
         return minZ = 0;

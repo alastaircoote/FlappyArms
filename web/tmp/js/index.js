@@ -27,7 +27,10 @@
 
   maxZ = 0;
 
-  document.ontouchstart = function() {
+  document.ontouchstart = function(e) {
+    if (e.touches > 1) {
+      return;
+    }
     maxZ = 0;
     return gyro.startTracking(function(o) {
       var avgVals, rounded;

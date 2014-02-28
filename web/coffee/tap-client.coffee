@@ -1,23 +1,31 @@
 comm.client = () ->
+    $("body").addClass("client")
     tb = $("<input type='number'/>")
     button = $("<button>Enter</button>")
-    socket = io.connect('http://10.0.1.9:5000');
+    socket = io.connect('http://actuallyflaptho.alastair.is:80');
+
+    tb.on "keydown", (e) ->
+        console.log e
+        e.preventDefault()
+        e.stopPropagation()
 
     $("body").append tb, button
 
     socket.on "attached", ->
         console.log "attached"
 
-
+    button.on "touchstart", (e) ->
+        e.stopPropagation()
     button.on "click", (e) ->
         console.log "hi"
         e.preventDefault()
-        socket.emit "attach-to-id", {code: tb.val()}
+        socket.emit "attach-to-id", {code: "11"}
 
 
-    socket.on "got-host", ->
-        console.log "got host"
-        $("body").on "click", ->
+
+    socket.on "got-host", (data) ->
+
+        $("body").on "flap", ->
             console.log "touched"
-            socket.emit "toucherated"
+            socket.emit "send", {ev: "toucherated", time:Date.now()}
 

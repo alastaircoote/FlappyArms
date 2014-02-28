@@ -4,13 +4,17 @@
         <meta charset="utf-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+        <link rel="stylesheet" href="css/main.css" type="text/css"/>
     </head>
     <body>
     <script src="js/modernizr.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="js/gyro.js"></script>
-    <!--<script src="js/index-new.js"></script>-->
-    <script src="http://10.0.1.9:5000/socket.io/socket.io.js"></script>
+    <script src="js/index-new.js"></script>
+    <script>
+    document.write('<script src="http://actuallyflaptho.alastair.is/socket.io/socket.io.js"></sc' + 'ript>')
+    </script>
+    
     <script>comm = {}</script>
     <script src="js/tap-server.js"></script>
     <script src="js/tap-client.js"></script>
@@ -21,5 +25,27 @@
             comm.server();
         }
     </script>
+<div id="gameholder">
+    <div style="position:fixed; top:100%; height: 0px;">
+    <div style = "position:relative;"></div>
+  </div>
+
+  <div id ="game-over-overlay" style="display:block;"></div>
+  <div id ="game-over" style="display:block;">
+    <h1>GAME OVER</h1>
+    <h1 id="score"></h1>
+  </div>
+
+  <canvas tabindex="1"></canvas>
+</div>
+  <script src="js/libs/underscore-min.js"></script>
+  <script src="js/libs/resources.js"></script>
+  <script src="js/game/sprite.js"></script>
+  <script src="js/game/game.js"></script>
+  <script src="js/game/entity.js"></script>
+  <script src="js/game/grass.js"></script>
+  <script src="js/game/obstacle.js"></script>
+  <script src="js/game/bird.js"></script>
+  <script src="js/game/birdie.js"></script>
     </body>
 </html>
