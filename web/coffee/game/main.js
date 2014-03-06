@@ -113,6 +113,8 @@ function reset() {
    $(".animated").css('-webkit-animation-play-state', 'running');
 }
 
+$("body").on("resetgame", reset)
+
 function showSplash()
 {
    currentstate = states.SplashScreen;

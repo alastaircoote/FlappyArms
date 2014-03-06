@@ -1,13 +1,14 @@
-define ["jquery","flap","servers","client-comm"], ($, flap, servers, ClientCommLayer) ->
+define ["jquery","flap","client-comm"], ($, flap, ClientCommLayer) ->
     class Client
-        isIos: (()->
-            return /(iPad|iPod|iPhone)/.test(window.navigator.userAgent)
-        )()
+        isIos: /(iPad|iPod|iPhone)/.test(window.navigator.userAgent)
         constructor: ->
             $("body").addClass("client")
 
             @connectForm = $("#clientsub")
             @commLayer = new ClientCommLayer()
+            @commLayer.on "receive", @receive
+            @commLayer.on "disconnected", @disconnected
+            @commLayer.on "badserver", () => @noHost()
             @connectForm.on "submit", @connect
 
             if @isIos
@@ -22,11 +23,8 @@ define ["jquery","flap","servers","client-comm"], ($, flap, servers, ClientCommL
             flap()
 
             $("body").on "flap", =>
-                console.log "touched"
-                if @connected
-                    @socket.emit "send", {ev: "toucherated", time:Date.now()}
-                else
-                    console.log "Flap while not connected."
+                console.log "touched", Date.now()
+                @commLayer.send {ev: "toucherated", time:Date.now()}
 
             # iOS has some weird buggyness where it'll scroll at times. If it does, reset it
             # back again.
@@ -40,42 +38,25 @@ define ["jquery","flap","servers","client-comm"], ($, flap, servers, ClientCommL
             if @isIos
                 val = @currentNum
 
-            
             @commLayer.connect val
             return
 
-
-            key = parseInt val.substr(0,1), 10
-            console.log key, val.substr(1)
-            if !servers.socketio[key-1]
-                return @noHost()
-            @socket = io.connect servers.socketio[key-1]
-            console.log "connecting"
-            @socket.on "connect", =>
-                @connected = true
-                console.log "connected"
-                @socket.emit "is-client", {code: val.substr(1)}
-            @socket.on "disconnect", =>
-                console.log "disconnected"
-                @connected = false
-            @socket.on "receive", @receive
+        disconnected: () =>
+            $("#client_intro").show()
+            $('#client_play').hide()
+            $("body").removeClass "doflap touched"
+            $('#codenum').val("")
 
         receive: (data) =>
-            console.log data
             if data.ev == "host-attached"
                 return @gotHost()
-            if data.ev == "host-disconnected"
-                $("#client_intro").show()
-                $('#client_play').hide()
-                $("body").removeClass "doflap touched"
-                @socket.disconnect()
+
             if data.ev == "no-host"
                 @noHost()
-                @socket.disconnect()
-            #window.location.reload()
 
         noHost: ->
             alert "Sorry, we couldn't find a partner with that ID. Try reloading both browsers."
+            @commLayer.disconnect()
 
         keydowned: (e) =>
 
@@ -101,9 +82,5 @@ define ["jquery","flap","servers","client-comm"], ($, flap, servers, ClientCommL
         gotHost: =>
             $("#client_intro").hide()
             $('#client_play').show()
-            $("body").addClass "doflap"
+            $("body").addClass "doflap touched"
             console.log "got host", arguments
-
-
-            
-

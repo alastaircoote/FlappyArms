@@ -1,11 +1,15 @@
-define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostCommLayer) ->
+define ["jquery","game/main","host-comm","logger"], ($, Birdie, HostCommLayer,Logger) ->
     class Server
         constructor: ->
-            comm = new HostCommLayer()
-            comm.connect()
+            @comm = new HostCommLayer()
+            @comm.connect()
 
-            comm.on "id-received", @receiveId
-            comm.on "receive", @receive
+            @comm.on "id-received", @receiveId
+            @comm.on "receive", @receive
+            @comm.on "disconnected", @disconnected
+            @comm.on "ping", (ping) ->
+                #$("#spanPing").html(ping)
+                #console.log "ping", ping
 
             $("#gamecontainer, #instruction-box").css "display","block"
             Birdie()
@@ -18,6 +22,12 @@ define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostC
 
             $("body").on "gameover", @gameover
 
+            Logger.on "info", (msg) ->
+                $("#infobox").append $("<p/>").html(msg)
+                $("#infobox").scrollTop 99999
+
+            $("#infobutton").on "click", -> $("#infobox").toggle()
+
         gotClient: =>
             if $("#gameover").css("display") == "block" then return
             $("#intro").hide()
@@ -28,21 +38,14 @@ define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostC
             $("#numbers").html data
 
         receive: (data) =>
-            console.log data
             if data.ev == "toucherated" then @flap(data)
             if data.ev == "client-attached" then @gotClient()
 
-            if data.ev == "client-disconnected"
-                console.log "disconnect"
-                return window.location.reload()
-                $("#instruction-box").show()
-                $("#intro").show()
-                $("#howtoplay, #signals").hide()
-
-
         flap: (data) =>
             @flapsSoFar++
-
+            d = new Date()
+            dFormat = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + ":" + d.getMilliseconds()
+            Logger.info "Received message at " + dFormat
             if @flapsSoFar == 1
                 $("#signal1").addClass("active")
             else if @flapsSoFar == 2
@@ -51,6 +54,7 @@ define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostC
                 $("#signal3").addClass("active")
             else
                 $("body").trigger "flap"
+
 
         gameover: (e, score) =>
             $("#bigscore").hide()
@@ -61,42 +65,10 @@ define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostC
 
             @flapsSoFar = 0
 
-            console.log arguments
-###
-comm.server = () ->
-
-    div = $("<div/>")
-    #$("body").append(div)
-
-    socket = io.connect('http://actuallyflaptho.alastair.is:80');
-    socket.emit "get-id"
-    socket.on "send-id", (val) ->
-        div.html "Go on your phone and enter 1" + val
-
-    socket.on "got-client", ->
-        console.log "got client"
-
-    gamestarted = false
-    socket.on "receive", (data) ->
-        if data.ev == "toucherated"
-            console.log "flapped"
-            #console.log Date.now() - data.time
-            #console.log "touched"
-            game = window.game
-
-            if game.isGameOver or !gamestarted
-                game.gameOver false
-                if !gamestarted then game.start()
-                gamestarted = true
-                return
-
-            game.keyPressed["space"] = {}
-            game.keyPressed["space"]["keydown"] = true
-            game.keyPressed["space"]["keyup"] = false
-
-            setTimeout ->
-                game.keyPressed["space"] = {}
-                game.keyPressed["space"]["keydown"] = false
-                game.keyPressed["space"]["keyup"] = true
-            ,20
-###
+        disconnected: () =>
+            $("#numbers").html ""
+            @socketId = null
+            $("#intro, #instruction-box, h1").show()
+            $("#howtoplay, #signals, #gameover").hide()
+            $("body").trigger "resetgame"
+            @comm.connect()

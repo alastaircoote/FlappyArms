@@ -4,6 +4,7 @@ define ["comm-layer","servers","logger"], (CommLayer,servers, Logger) ->
             @on "socketio-connected", => @socket.emit "is-host"
             @on "webrtc-connected", @webRTCConnected
             @on "receive", @receive
+            super()
 
         connect: () =>
             @serverIndex = Math.floor(Math.random() * servers.socketio.length)

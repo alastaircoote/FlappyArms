@@ -25,7 +25,7 @@ module.exports = class HostClient
 
     constructor: (@hostSocket) ->
         @id = savedSockets.add @
-        @sendToHost {ev: "receive-id", id: @id}
+        @sendToHost {ev: "receive-id", id: @id,serverTime: Date.now()}
         @hostSocket.on "attach-peerid", @attachPeerId
 
     attachPeerId: (id) =>
@@ -42,7 +42,7 @@ module.exports = class HostClient
 
     attachClient: (@clientSocket) =>
         @sendToHost {ev: "client-attached"}
-        @sendToClient {ev: "host-attached", peerId: @peerId}
+        @sendToClient {ev: "host-attached", peerId: @peerId, serverTime: Date.now()}
 
         @clientSocket.on "disconnect", => @disconnected("client")
         @hostSocket.on "disconnect", => @disconnected("host")
@@ -51,9 +51,13 @@ module.exports = class HostClient
         @hostSocket.on "send", (data) => @sendToClient(data)
 
     disconnected: (from) =>
-        console.log "discon", @hostSocket.connected, @clientSocket.connected
-        if from == "client" && @hostSocket.connected
+        if @alreadyDisconnected == true then return
+        @alreadyDisconnected = true
+        console.log "discon", @hostSocket.disconnected, @clientSocket.disconnected
+        if from == "client" && !@hostSocket.disconnected
             @hostSocket.disconnect()
-        else if @clientSocket.connected
+            @hostSocket = null
+        else if !@clientSocket.disconnected
             @clientSocket.disconnect()
+            @clientSocket = null
         savedSockets.remove @

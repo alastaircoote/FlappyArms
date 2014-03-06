@@ -82,21 +82,20 @@ define ["libs/gyro"], (gyro) ->
                 if maxZ > 10
 
                     #sanity check
-                    if Date.now() - lastFlap < 200 then return
+                    if Date.now() - lastFlap < 500 then return
 
                     lastFlap = Date.now()
-                    console.log "flapperated"
-
-                    $("body").trigger ("flap")
 
                     setTimeout () ->
                         maxZ = 0
                         minZ = 0
-                    , 1000
+                    , 500
                     #if navigator.vibrate then navigator.vibrate(100)
 
                     maxZ = 0
                     minZ = 0
+
+                    $("body").trigger ("flap")
             #else if rounded.z <= -maxZ
                 #console.log "huh"
                 #maxZ = 0
