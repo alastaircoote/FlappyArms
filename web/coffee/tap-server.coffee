@@ -28,7 +28,6 @@ define ["servers","socket","game/main"], (servers, io, Birdie) ->
             $("#numbers").html String(@key+1) + data
 
         receive: (data) =>
-            console.log data
             if data.ev == "toucherated" then @flap(data)
             if data.ev == "client-disconnected"
                 console.log "disconnect"

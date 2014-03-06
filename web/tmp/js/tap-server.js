@@ -41,7 +41,6 @@
       };
 
       Server.prototype.receive = function(data) {
-        console.log(data);
         if (data.ev === "toucherated") {
           this.flap(data);
         }

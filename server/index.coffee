@@ -7,7 +7,7 @@ removeSocket = (entry) ->
     if found
         savedSockets.splice savedSockets.indexOf(found), 1
     console.log "disconnected, now #{savedSockets.length} clients..."
-io.set( 'origins', '*:*' )
+io.set( 'origins', 'http://experimenting.alastair.is:80' )
 
 io.sockets.on 'connection', (socket) ->
     

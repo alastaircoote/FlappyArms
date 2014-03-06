@@ -10,13 +10,16 @@
       },
       "game/buzz.min": {
         exports: "buzz"
+      },
+      "libs/jquery.transit.min": {
+        deps: ["jquery"]
       }
     }
   });
 
   require(['tap-client', 'tap-server'], function(Client, Server) {
     console.log(Modernizr.touch);
-    if (/(iPad|iPod|iPhone)/.test(window.navigator.userAgent)) {
+    if (/iPad/.test(window.navigator.userAgent)) {
       $("body").addClass("ipad");
       $("body").css("height", "672px");
       new Server();
