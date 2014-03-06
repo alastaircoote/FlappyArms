@@ -16,7 +16,12 @@ requirejs
 
 require ['tap-client', 'tap-server'], (Client,Server) ->
     console.log Modernizr.touch
-    if Modernizr.touch
+    if /(iPad|iPod|iPhone)/.test(window.navigator.userAgent)
+        $("body").addClass("ipad")
+        $("body").css "height", "672px"
+        new Server()
+        return
+    if Modernizr.touch && window.location.search.indexOf("server=1") == -1
         new Client()
     else
         new Server()

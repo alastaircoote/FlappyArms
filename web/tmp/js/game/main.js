@@ -89,16 +89,14 @@ function setCookie(cname,cvalue,exdays)
    document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
-function showSplash()
-{
-   currentstate = states.SplashScreen;
-   
+function reset() {
+
    //set the defaults (again)
    velocity = 0;
    position = 180;
    rotation = 0;
    score = 0;
-   
+
    //update the player in preparation for the next game
    $("#player").css({ y: 0, x: 0});
    updatePlayer($("#player"));
@@ -113,6 +111,15 @@ function showSplash()
    //make everything animated again
    $(".animated").css('animation-play-state', 'running');
    $(".animated").css('-webkit-animation-play-state', 'running');
+}
+
+function showSplash()
+{
+   currentstate = states.SplashScreen;
+   
+   
+   
+   reset()
    
    //fade in the splash
    $("#splash").transition({ opacity: 1 }, 2000, 'ease');
@@ -120,6 +127,7 @@ function showSplash()
 
 function startGame()
 {
+   $("body").trigger("gameStarted")
    currentstate = states.GameScreen;
    
    //fade out the splash
@@ -251,6 +259,7 @@ function gameloop() {
 }
 
 //Handle space bar
+/*
 $(document).keydown(function(e){
    //space bar!
    if(e.keyCode == 32)
@@ -263,14 +272,17 @@ $(document).keydown(function(e){
    }
 });
 
-$("body").on("flap",screenClick)
-
+*/
+$("body").on("flap",function() {
+   screenClick()
+})
+/*
 //Handle mouse down OR touch start
 if("ontouchstart" in window)
    $(document).on("touchstart", screenClick);
 else
    $(document).on("mousedown", screenClick);
-
+*/
 function screenClick()
 {
    if(currentstate == states.GameScreen)
@@ -279,6 +291,7 @@ function screenClick()
    }
    else if(currentstate == states.SplashScreen)
    {
+      reset();
       startGame();
    }
 }
@@ -388,6 +401,8 @@ function playerDead()
 
 function showScore()
 {
+   currentstate = states.SplashScreen;
+   return $("body").trigger("gameover",[score]);
    //unhide us
    $("#scoreboard").css("display", "block");
    

@@ -17,20 +17,27 @@ define ["libs/gyro"], (gyro) ->
 
     lastFlap = 0
 
+    document.ontouchmove = (e) ->
+        e.preventDefault()
+
+
+    currentState = ""
     document.ontouchstart = (e) ->
-        console.log e.target
+        if !$("body").hasClass("doflap") then return
+        $("body").addClass "touched"
         e.stopPropagation()
-        if e.target == document.body
-            e.preventDefault()
+        #if e.target == document.body
+            #e.preventDefault()
         if e.touches.length > 1 then return
-        console.log "touchstart"
         maxZ = 0
         minZ = 0
         gyro.startTracking (o) ->
 
+
+
             lastFive.push o
 
-            #if lastFive.length < 5 then return
+            if lastFive.length < 5 then return
 
             avgVals =
                 x: avg lastFive.map (o) -> o.x
@@ -51,7 +58,16 @@ define ["libs/gyro"], (gyro) ->
                 y: Math.round(o.y)
                 z: Math.round(o.z)
             
-            console.log rounded.z
+
+            
+
+            if currentState == "positive" and rounded.z < 0
+                #console.log "DO RESET"
+                minZ = 0
+                #maxZ = 0
+            else
+
+                currentState = if rounded.z < 0 then "negative" else "positive"
 
             #if old?.z != rounded.z then console.log rounded
 
@@ -59,9 +75,11 @@ define ["libs/gyro"], (gyro) ->
             if rounded.z < minZ then minZ = rounded.z
             if rounded.z > maxZ then maxZ = rounded.z
 
-            if rounded.z >= -minZ
-                
-                if minZ < -3
+            #console.log rounded.z, minZ, maxZ
+
+            if rounded.z >= -minZ and minZ < 0 and maxZ > 0
+                console.log "maybe flap", minZ, maxZ
+                if maxZ > 10
 
                     #sanity check
                     if Date.now() - lastFlap < 200 then return
@@ -70,10 +88,15 @@ define ["libs/gyro"], (gyro) ->
                     console.log "flapperated"
 
                     $("body").trigger ("flap")
-                    if navigator.vibrate then navigator.vibrate(100)
 
-                maxZ = 0
-                minZ = 0
+                    setTimeout () ->
+                        maxZ = 0
+                        minZ = 0
+                    , 1000
+                    #if navigator.vibrate then navigator.vibrate(100)
+
+                    maxZ = 0
+                    minZ = 0
             #else if rounded.z <= -maxZ
                 #console.log "huh"
                 #maxZ = 0
@@ -83,5 +106,5 @@ define ["libs/gyro"], (gyro) ->
 
 
     document.ontouchend = () ->
-        console.log "end"
+        $("body").removeClass "touched"
         gyro.stopTracking()

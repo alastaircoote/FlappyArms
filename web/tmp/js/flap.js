@@ -1,6 +1,6 @@
 (function() {
   define(["libs/gyro"], function(gyro) {
-    var avg, isOn, lastFive, lastFlap, maxZ, minZ, old;
+    var avg, currentState, isOn, lastFive, lastFlap, maxZ, minZ, old;
     isOn = false;
     old = null;
     gyro.frequency = 10;
@@ -17,21 +17,27 @@
     maxZ = 0;
     minZ = 0;
     lastFlap = 0;
+    document.ontouchmove = function(e) {
+      return e.preventDefault();
+    };
+    currentState = "";
     document.ontouchstart = function(e) {
-      console.log(e.target);
-      e.stopPropagation();
-      if (e.target === document.body) {
-        e.preventDefault();
+      if (!$("body").hasClass("doflap")) {
+        return;
       }
+      $("body").addClass("touched");
+      e.stopPropagation();
       if (e.touches.length > 1) {
         return;
       }
-      console.log("touchstart");
       maxZ = 0;
       minZ = 0;
       return gyro.startTracking(function(o) {
         var avgVals, rounded;
         lastFive.push(o);
+        if (lastFive.length < 5) {
+          return;
+        }
         avgVals = {
           x: avg(lastFive.map(function(o) {
             return o.x;
@@ -54,7 +60,11 @@
           y: Math.round(o.y),
           z: Math.round(o.z)
         };
-        console.log(rounded.z);
+        if (currentState === "positive" && rounded.z < 0) {
+          minZ = 0;
+        } else {
+          currentState = rounded.z < 0 ? "negative" : "positive";
+        }
         old = rounded;
         if (rounded.z < minZ) {
           minZ = rounded.z;
@@ -62,25 +72,27 @@
         if (rounded.z > maxZ) {
           maxZ = rounded.z;
         }
-        if (rounded.z >= -minZ) {
-          if (minZ < -3) {
+        if (rounded.z >= -minZ && minZ < 0 && maxZ > 0) {
+          console.log("maybe flap", minZ, maxZ);
+          if (maxZ > 10) {
             if (Date.now() - lastFlap < 200) {
               return;
             }
             lastFlap = Date.now();
             console.log("flapperated");
             $("body").trigger("flap");
-            if (navigator.vibrate) {
-              navigator.vibrate(100);
-            }
+            setTimeout(function() {
+              maxZ = 0;
+              return minZ = 0;
+            }, 1000);
+            maxZ = 0;
+            return minZ = 0;
           }
-          maxZ = 0;
-          return minZ = 0;
         }
       });
     };
     return document.ontouchend = function() {
-      console.log("end");
+      $("body").removeClass("touched");
       return gyro.stopTracking();
     };
   });

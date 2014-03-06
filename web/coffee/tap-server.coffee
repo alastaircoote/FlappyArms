@@ -11,21 +11,34 @@ define ["servers","socket","game/main"], (servers, io, Birdie) ->
             Birdie()
             @flapsSoFar = 0
 
+            $("body").on "gameStarted", ->
+                $("#bigscore").show()
+                $("#instruction-box").hide()
+                $("#howtoplay, #intro, h1").hide()
+
+            $("body").on "gameover", @gameover
+
         gotClient: =>
+            if $("#gameover").css("display") == "block" then return
             $("#intro").hide()
-            $("#howtoplay").show()
+            $("#howtoplay, #signals").show()
 
         receiveId: (data) =>
             @socketId = data
             $("#numbers").html String(@key+1) + data
 
         receive: (data) =>
+            console.log data
             if data.ev == "toucherated" then @flap(data)
+            if data.ev == "client-disconnected"
+                console.log "disconnect"
+                return window.location.reload()
+                $("#instruction-box").show()
+                $("#intro").show()
+                $("#howtoplay, #signals").hide()
 
 
         flap: (data) =>
-            console.log "flap!"
-            
             @flapsSoFar++
 
             if @flapsSoFar == 1
@@ -35,9 +48,18 @@ define ["servers","socket","game/main"], (servers, io, Birdie) ->
             else if @flapsSoFar == 3
                 $("#signal3").addClass("active")
             else
-                if @flapsSoFar == 4
-                    $("#instruction-box").css "opacity", 0
                 $("body").trigger "flap"
+
+        gameover: (e, score) =>
+            $("#bigscore").hide()
+            $("#score").html score
+            $("#gameover, #signals").show()
+            $("#signals .signal.active").removeClass("active")
+            $("#instruction-box").show()
+
+            @flapsSoFar = 0
+
+            console.log arguments
 ###
 comm.server = () ->
 

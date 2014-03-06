@@ -5,6 +5,7 @@
     var Server;
     return Server = (function() {
       function Server() {
+        this.gameover = __bind(this.gameover, this);
         this.flap = __bind(this.flap, this);
         this.receive = __bind(this.receive, this);
         this.receiveId = __bind(this.receiveId, this);
@@ -18,11 +19,20 @@
         $("#gamecontainer, #instruction-box").css("display", "block");
         Birdie();
         this.flapsSoFar = 0;
+        $("body").on("gameStarted", function() {
+          $("#bigscore").show();
+          $("#instruction-box").hide();
+          return $("#howtoplay, #intro, h1").hide();
+        });
+        $("body").on("gameover", this.gameover);
       }
 
       Server.prototype.gotClient = function() {
+        if ($("#gameover").css("display") === "block") {
+          return;
+        }
         $("#intro").hide();
-        return $("#howtoplay").show();
+        return $("#howtoplay, #signals").show();
       };
 
       Server.prototype.receiveId = function(data) {
@@ -31,13 +41,20 @@
       };
 
       Server.prototype.receive = function(data) {
+        console.log(data);
         if (data.ev === "toucherated") {
-          return this.flap(data);
+          this.flap(data);
+        }
+        if (data.ev === "client-disconnected") {
+          console.log("disconnect");
+          return window.location.reload();
+          $("#instruction-box").show();
+          $("#intro").show();
+          return $("#howtoplay, #signals").hide();
         }
       };
 
       Server.prototype.flap = function(data) {
-        console.log("flap!");
         this.flapsSoFar++;
         if (this.flapsSoFar === 1) {
           return $("#signal1").addClass("active");
@@ -46,11 +63,18 @@
         } else if (this.flapsSoFar === 3) {
           return $("#signal3").addClass("active");
         } else {
-          if (this.flapsSoFar === 4) {
-            $("#instruction-box").css("opacity", 0);
-          }
           return $("body").trigger("flap");
         }
+      };
+
+      Server.prototype.gameover = function(e, score) {
+        $("#bigscore").hide();
+        $("#score").html(score);
+        $("#gameover, #signals").show();
+        $("#signals .signal.active").removeClass("active");
+        $("#instruction-box").show();
+        this.flapsSoFar = 0;
+        return console.log(arguments);
       };
 
       return Server;

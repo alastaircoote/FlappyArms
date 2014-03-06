@@ -1,6 +1,10 @@
 @import "reset.css";
 @import "main-game.css";
 
+html {
+  height: 200px;
+  overflow: hidden;
+}
 body {
   position: absolute;
   overflow: hidden;
@@ -10,10 +14,18 @@ body {
   left:0;
   margin:0;
 
-
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+
+* {
+   -khtml-user-select: none;
+ -moz-user-select: none;
+ -ms-user-select: none;
+  user-select: none;
+ -webkit-touch-callout: none;
+ -webkit-user-select: none;
 }
 
 #gameholder {
@@ -70,14 +82,11 @@ body.client {
     display: none;
     }
 
-    & {
-       position: absolute;
-       top:0;
-       left:0;
-       width: 100%;
-       height: 100%;
-       background:red;
-    }
+   
+}
+
+#splash {
+  display:none;
 }
 
 #instruction-box {
@@ -93,7 +102,8 @@ body.client {
   border: solid 5px #ccc;
   font-family: "Press Start 2P";
   color:#000;
-  -webkit-transition: opacity 0.5 ease-in;
+  //-webkit-transition: opacity 0.5s ease-in;
+  //transition: opacity 0.5s ease-in;
 
   h1 {
     margin: 5vmin 0;
@@ -115,17 +125,28 @@ body.client {
     text-align: center;
     line-height: 1.2em;
   }
+
+  body.ipad & {
+    -webkit-transform:scale(0.5,0.5);
+    //margin-top: -55vmin;
+  }
+  
 }
 
 #gamecontainer, #instruction-box {
   display: none;
 }
 
-#howtoplay {
+#howtoplay, #gameover {
   display: none;
 }
 
-.signals {
+#gameover {
+  margin-top: 10vmin;
+}
+
+#signals {
+  display: none;
   text-align: center;
   margin-top: 6vmin;
   .signal {
@@ -138,5 +159,102 @@ body.client {
     &.active {
       background: green;
     }
+  }
+}
+
+#client, #client_play {
+  display: none;
+  color:#000;
+font-family: "Press Start 2P";
+  
+    form {
+      margin-bottom: 5vmin;
+    }
+    h1 {
+      
+      font-size: 8vmin;
+      margin: 5vmin 0;
+      text-align: center;
+      font-family: "Press Start 2P";
+    }
+
+    h3 {
+      text-align: center;
+      font-size: 3vmin;
+      margin:8vmin;
+    }
+
+    p {
+      font-family: "Press Start 2P";
+      margin: 0 3vmin;
+      font-size: 4vmin;
+      line-height: 1.2em;
+      text-align: center;
+    }
+
+    .holder {
+      position: relative;
+      height: 20vw;
+    }
+
+    #codenum, #nums {
+      width: 90vw;
+      display: block;
+      margin: 6vw 5vw 3vw;
+      font-size: 8vw;
+      font-family: "Press Start 2P";
+      padding: 2vw;
+      text-align: center;
+      border: solid 3px #aaa;
+      background:transparent;
+      position: absolute;
+      z-index:2;
+      //line-height: 10vmin;
+    }
+
+    #nums {
+      position: absolute;
+      z-index:1;
+      border-color:transparent;
+    }
+
+    .sub {
+      display:block;
+      width:90vw;
+      margin: 0vw 5vw;
+      font-family: "Press Start 2P";
+      padding: 2vw;
+      text-align: center;
+      height: 12vw;
+      font-size: 4vw;
+      background: #ccc;
+      border: solid 3px #aaa;
+    }
+
+}
+
+body.client #client {
+    display: block;
+  }
+
+#client_play {
+  display: none;
+}
+
+#touchtarget {
+  width: 80vmin;
+  height: 80vmin;
+  margin: 10vmin 10vmin 0;
+  background: red;
+  border-radius: 40vmin;
+}
+
+body.touched {
+  background: green;
+  #touchtarget {
+    background: white;
+  }
+  #client_play {
+    color:#fff;
   }
 }
