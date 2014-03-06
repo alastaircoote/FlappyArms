@@ -1,4 +1,4 @@
-define ["jquery","flap","servers"], ($, flap, servers) ->
+define ["jquery","flap","servers","client-comm"], ($, flap, servers, ClientCommLayer) ->
     class Client
         isIos: (()->
             return /(iPad|iPod|iPhone)/.test(window.navigator.userAgent)
@@ -7,21 +7,17 @@ define ["jquery","flap","servers"], ($, flap, servers) ->
             $("body").addClass("client")
 
             @connectForm = $("#clientsub")
-
+            @commLayer = new ClientCommLayer()
             @connectForm.on "submit", @connect
 
-
-            #@button.on "touchstart", (e) ->
-            #    console.log "ts"
-            #    e.stopPropagation()
             if @isIos
+                # iOS's 'shake to undo' feature totally ruins any accelerometer reading.
+                # so we actually have to disallow text input, and display it ourselves
                 $('#codenum').on "keydown", @keydowned
                 $("#codenum").on 'focus', =>
                     @currentNum = ""
                     $('#nums').html ""
-            #$('#codenum').on "keyup", @keypressed
 
-            #$("body").append @tb, @button
             @currentNum = ""
             flap()
 
@@ -32,9 +28,8 @@ define ["jquery","flap","servers"], ($, flap, servers) ->
                 else
                     console.log "Flap while not connected."
 
-            #if @isIos
-            #    alert "This hasn't been tested with an iPhone, and might not work with one. Watch this space."
-
+            # iOS has some weird buggyness where it'll scroll at times. If it does, reset it
+            # back again.
             $(window).on "scroll", ->
                 $(window).scrollTop(0)
 
@@ -44,24 +39,31 @@ define ["jquery","flap","servers"], ($, flap, servers) ->
             val = $('#codenum').val()
             if @isIos
                 val = @currentNum
+
+            
+            @commLayer.connect val
+            return
+
+
             key = parseInt val.substr(0,1), 10
             console.log key, val.substr(1)
-            if !servers[key-1]
+            if !servers.socketio[key-1]
                 return @noHost()
-            @socket = io.connect servers[key-1]
+            @socket = io.connect servers.socketio[key-1]
             console.log "connecting"
             @socket.on "connect", =>
                 @connected = true
                 console.log "connected"
-                @socket.emit "attach-to-id", {code: val}
+                @socket.emit "is-client", {code: val.substr(1)}
             @socket.on "disconnect", =>
                 console.log "disconnected"
                 @connected = false
-            @socket.on "got-host", @gotHost
             @socket.on "receive", @receive
 
         receive: (data) =>
             console.log data
+            if data.ev == "host-attached"
+                return @gotHost()
             if data.ev == "host-disconnected"
                 $("#client_intro").show()
                 $('#client_play').hide()
@@ -70,7 +72,7 @@ define ["jquery","flap","servers"], ($, flap, servers) ->
             if data.ev == "no-host"
                 @noHost()
                 @socket.disconnect()
-            window.location.reload()
+            #window.location.reload()
 
         noHost: ->
             alert "Sorry, we couldn't find a partner with that ID. Try reloading both browsers."

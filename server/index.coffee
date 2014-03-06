@@ -1,21 +1,23 @@
 io = require('socket.io').listen(5000)
+{PeerServer} = require('peer')
+HostClient = require "./hostclient"
+peer = new PeerServer {port: 5001, path: "/"}
 
-savedSockets = []
+peer.on "connection", ->
+    console.log "peer connected"
 
-removeSocket = (entry) ->
-    found = savedSockets.filter((s) => s.socket.id == this.id)[0]
-    if found
-        savedSockets.splice savedSockets.indexOf(found), 1
-    console.log "disconnected, now #{savedSockets.length} clients..."
-io.set( 'origins', 'http://experimenting.alastair.is:80' )
+peer.on "disconnection", ->
+    console.log "peer disconnected"
+
+io.set( 'origins', '*:*' )
 
 io.sockets.on 'connection', (socket) ->
-    
-    savedSockets.push {
-        socket: socket
-    }
 
-    socket.on "get-id", () ->
+    socket.on "is-host", () ->
+
+        hc = new HostClient(socket)
+
+        ###
         entry = savedSockets.filter((s) => s.socket.id == this.id)[0]
         code = Math.round(Math.random() * 1000)
         while savedSockets.filter((s) -> s.hostCode == code).length > 0
@@ -24,8 +26,18 @@ io.sockets.on 'connection', (socket) ->
 
         entry.code = code
         socket.emit "send-id", code
+        ###
+    socket.on "is-client", (args) ->
+        console.log "Searching for #{args.code}"
+        hc = HostClient.get(args.code)
+        if !hc
+            return socket.emit "receive", {ev:"no-host"}
+        else if hc.client
+            return socket.emit "receive", {ev:"already-used"}
 
-    socket.on "attach-to-id", (args) ->
+        hc.attachClient socket
+
+        ###
         console.log "Looking for host" + parseInt(args.code.substr(1)) + " in "
         console.log savedSockets
         host = savedSockets.filter((s) => s.code == parseInt(args.code.substr(1)))[0]
@@ -55,5 +67,4 @@ io.sockets.on 'connection', (socket) ->
 
         this.host.on "send", (data) ->
             socket.emit "receive", data
-
-    socket.on "disconnect", removeSocket
+        ###

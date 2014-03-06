@@ -1,7 +1,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(["jquery", "flap", "servers"], function($, flap, servers) {
+  define(["jquery", "flap", "servers", "client-comm"], function($, flap, servers, ClientCommLayer) {
     var Client;
     return Client = (function() {
       Client.prototype.isIos = (function() {
@@ -16,6 +16,7 @@
         this.connect = __bind(this.connect, this);
         $("body").addClass("client");
         this.connectForm = $("#clientsub");
+        this.commLayer = new ClientCommLayer();
         this.connectForm.on("submit", this.connect);
         if (this.isIos) {
           $('#codenum').on("keydown", this.keydowned);
@@ -54,19 +55,21 @@
         if (this.isIos) {
           val = this.currentNum;
         }
+        this.commLayer.connect(val);
+        return;
         key = parseInt(val.substr(0, 1), 10);
         console.log(key, val.substr(1));
-        if (!servers[key - 1]) {
+        if (!servers.socketio[key - 1]) {
           return this.noHost();
         }
-        this.socket = io.connect(servers[key - 1]);
+        this.socket = io.connect(servers.socketio[key - 1]);
         console.log("connecting");
         this.socket.on("connect", (function(_this) {
           return function() {
             _this.connected = true;
             console.log("connected");
-            return _this.socket.emit("attach-to-id", {
-              code: val
+            return _this.socket.emit("is-client", {
+              code: val.substr(1)
             });
           };
         })(this));
@@ -76,12 +79,14 @@
             return _this.connected = false;
           };
         })(this));
-        this.socket.on("got-host", this.gotHost);
         return this.socket.on("receive", this.receive);
       };
 
       Client.prototype.receive = function(data) {
         console.log(data);
+        if (data.ev === "host-attached") {
+          return this.gotHost();
+        }
         if (data.ev === "host-disconnected") {
           $("#client_intro").show();
           $('#client_play').hide();
@@ -90,9 +95,8 @@
         }
         if (data.ev === "no-host") {
           this.noHost();
-          this.socket.disconnect();
+          return this.socket.disconnect();
         }
-        return window.location.reload();
       };
 
       Client.prototype.noHost = function() {

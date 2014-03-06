@@ -11,9 +11,13 @@ requirejs
                 "game/buzz.min"
             ]
         "game/buzz.min":
-            exports:"buzz"
+            exports: "buzz"
         "libs/jquery.transit.min":
             deps: ["jquery"]
+        "libs/socketio":
+            exports: "io"
+        "libs/peer":
+            exports: "Peer"
 
 
 require ['tap-client', 'tap-server'], (Client,Server) ->

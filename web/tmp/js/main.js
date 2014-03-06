@@ -13,6 +13,12 @@
       },
       "libs/jquery.transit.min": {
         deps: ["jquery"]
+      },
+      "libs/socketio": {
+        exports: "io"
+      },
+      "libs/peer": {
+        exports: "Peer"
       }
     }
   });

@@ -1,7 +1,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(["servers", "socket", "game/main"], function(servers, io, Birdie) {
+  define(["servers", "socket", "game/main", "host-comm"], function(servers, io, Birdie, HostCommLayer) {
     var Server;
     return Server = (function() {
       function Server() {
@@ -10,12 +10,11 @@
         this.receive = __bind(this.receive, this);
         this.receiveId = __bind(this.receiveId, this);
         this.gotClient = __bind(this.gotClient, this);
-        this.key = Math.floor(Math.random() * servers.length);
-        this.socket = io.connect(servers[this.key]);
-        this.socket.on("send-id", this.receiveId);
-        this.socket.on("receive", this.receive);
-        this.socket.on("got-client", this.gotClient);
-        this.socket.emit("get-id");
+        var comm;
+        comm = new HostCommLayer();
+        comm.connect();
+        comm.on("id-received", this.receiveId);
+        comm.on("receive", this.receive);
         $("#gamecontainer, #instruction-box").css("display", "block");
         Birdie();
         this.flapsSoFar = 0;
@@ -37,12 +36,16 @@
 
       Server.prototype.receiveId = function(data) {
         this.socketId = data;
-        return $("#numbers").html(String(this.key + 1) + data);
+        return $("#numbers").html(data);
       };
 
       Server.prototype.receive = function(data) {
+        console.log(data);
         if (data.ev === "toucherated") {
           this.flap(data);
+        }
+        if (data.ev === "client-attached") {
+          this.gotClient();
         }
         if (data.ev === "client-disconnected") {
           console.log("disconnect");

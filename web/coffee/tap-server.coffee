@@ -1,12 +1,12 @@
-define ["servers","socket","game/main"], (servers, io, Birdie) ->
+define ["servers","socket","game/main","host-comm"], (servers, io, Birdie, HostCommLayer) ->
     class Server
         constructor: ->
-            @key = Math.floor(Math.random() * servers.length)
-            @socket = io.connect(servers[@key])
-            @socket.on "send-id", @receiveId
-            @socket.on "receive", @receive
-            @socket.on "got-client", @gotClient
-            @socket.emit "get-id"
+            comm = new HostCommLayer()
+            comm.connect()
+
+            comm.on "id-received", @receiveId
+            comm.on "receive", @receive
+
             $("#gamecontainer, #instruction-box").css "display","block"
             Birdie()
             @flapsSoFar = 0
@@ -25,10 +25,13 @@ define ["servers","socket","game/main"], (servers, io, Birdie) ->
 
         receiveId: (data) =>
             @socketId = data
-            $("#numbers").html String(@key+1) + data
+            $("#numbers").html data
 
         receive: (data) =>
+            console.log data
             if data.ev == "toucherated" then @flap(data)
+            if data.ev == "client-attached" then @gotClient()
+
             if data.ev == "client-disconnected"
                 console.log "disconnect"
                 return window.location.reload()
