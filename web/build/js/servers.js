@@ -1,1 +1,0 @@
-(function(){define(function(){return{socketio:["http://actuallyflaptho.alastair.is:80"],webrtc:["actuallyflaptho.alastair.is"]}})}).call(this);
