@@ -1,0 +1,67 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', '--save', 'awspublish' ]
+2 info using npm@1.4.3
+3 info using node@v0.10.26
+4 warn package.json acceler@0.0.0 No description
+5 warn package.json acceler@0.0.0 No repository field.
+6 warn package.json acceler@0.0.0 No README data
+7 verbose readDependencies using package.json deps
+8 verbose cache add [ 'awspublish', null ]
+9 verbose cache add name=undefined spec="awspublish" args=["awspublish",null]
+10 verbose parsed url { protocol: null,
+10 verbose parsed url   slashes: null,
+10 verbose parsed url   auth: null,
+10 verbose parsed url   host: null,
+10 verbose parsed url   port: null,
+10 verbose parsed url   hostname: null,
+10 verbose parsed url   hash: null,
+10 verbose parsed url   search: null,
+10 verbose parsed url   query: null,
+10 verbose parsed url   pathname: 'awspublish',
+10 verbose parsed url   path: 'awspublish',
+10 verbose parsed url   href: 'awspublish' }
+11 silly lockFile bd1ab6e8-awspublish awspublish
+12 verbose lock awspublish /Users/204976/.npm/bd1ab6e8-awspublish.lock
+13 silly lockFile bd1ab6e8-awspublish awspublish
+14 silly lockFile bd1ab6e8-awspublish awspublish
+15 verbose addNamed [ 'awspublish', '' ]
+16 verbose addNamed [ null, '*' ]
+17 silly lockFile 873c6df1-awspublish awspublish@
+18 verbose lock awspublish@ /Users/204976/.npm/873c6df1-awspublish.lock
+19 silly addNameRange { name: 'awspublish', range: '*', hasData: false }
+20 verbose url raw awspublish
+21 verbose url resolving [ 'https://registry.npmjs.org/', './awspublish' ]
+22 verbose url resolved https://registry.npmjs.org/awspublish
+23 info trying registry request attempt 1 at 18:45:22
+24 http GET https://registry.npmjs.org/awspublish
+25 http 404 https://registry.npmjs.org/awspublish
+26 silly registry.get cb [ 404,
+26 silly registry.get   { date: 'Thu, 06 Mar 2014 23:45:23 GMT',
+26 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B)',
+26 silly registry.get     'content-type': 'application/json',
+26 silly registry.get     via: '1.1 varnish',
+26 silly registry.get     'cache-control': 'max-age=0',
+26 silly registry.get     'content-length': '52',
+26 silly registry.get     'accept-ranges': 'bytes',
+26 silly registry.get     age: '0',
+26 silly registry.get     'x-served-by': 'cache-v36-ASH, cache-jfk1031-JFK',
+26 silly registry.get     'x-cache': 'MISS, MISS',
+26 silly registry.get     'x-cache-hits': '0, 0',
+26 silly registry.get     'x-timer': 'S1394149522.994160175,VS0,VS-513,VE-490,VE29',
+26 silly registry.get     'keep-alive': 'timeout=10, max=50',
+26 silly registry.get     connection: 'Keep-Alive' } ]
+27 silly lockFile 873c6df1-awspublish awspublish@
+28 silly lockFile 873c6df1-awspublish awspublish@
+29 error 404 'awspublish' is not in the npm registry.
+29 error 404 You should bug the author to publish it
+29 error 404 It was specified as a dependency of 'acceler'
+29 error 404
+29 error 404 Note that you can also install from a
+29 error 404 tarball, folder, or http url, or git url.
+30 error System Darwin 13.1.0
+31 error command "node" "/usr/local/bin/npm" "install" "--save" "awspublish"
+32 error cwd /Users/204976/Projects/flappy/web
+33 error node -v v0.10.26
+34 error npm -v 1.4.3
+35 error code E404
+36 verbose exit [ 1, true ]

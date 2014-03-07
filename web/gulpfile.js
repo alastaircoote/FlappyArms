@@ -60,7 +60,7 @@ gulp.task("build",function() {
   gulp.src('./*.html').pipe(gulp.dest("./build/"));
   
   gulp.src('./fonts/*.*').pipe(gulp.dest("./build/fonts"))
-  gulp.src('./data/*.*').pipe(awspublish.gzip()).pipe(gulp.dest("./build/data"))
+  gulp.src('./data/*.*').pipe(gulp.dest("./build/data"))
   
   gulp.src('./coffee/**/*.js').pipe(uglify()).pipe(gulp.dest("./build/js/"))
   gulp.src('./assets/**/*').pipe(gulp.dest("./build/assets/"))
@@ -96,7 +96,7 @@ gulp.task("build-req", function() {
         },
         // ... more require.js options
     })
-        .pipe(awspublish.gzip()).pipe(gulp.dest('./build/js'));
+        .pipe(gulp.dest('./build/js'));
   })
    
 })
