@@ -133,9 +133,10 @@ body
 #gamecontainer
 {
    position: relative;
-   width: 100%;
+   width: 50%;
    height: 100%;
    min-height: 525px;
+   overflow: hidden;
 }
 
 /*
