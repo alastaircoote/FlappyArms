@@ -7,6 +7,7 @@ define ["jquery"], ($) ->
             @server.on "id-received", @setId
 
             @playerIDs = []
+            @playersReady = 0
 
         show: =>
             @$el.show()
@@ -29,12 +30,9 @@ define ["jquery"], ($) ->
 
             # DUMMY
             @clientConnected(1)
-            @clientConnected(2)
-            @clientConnected(3)
-            @clientConnected(4)
+          
 
             @flap(1)
-            @flap(2)
             @flap(1)
             @flap(1)
 
@@ -65,6 +63,12 @@ define ["jquery"], ($) ->
             if inactiveBlocks.length == 1
                 # Then we've done all three
                 $(".flapboxes",box).remove()
+                $("p",box).html "You're ready to go!"
+                @playersReady++
+                if @playersReady == @playerIDs.length
+                    @allPlayersReady()
+
+        allPlayersReady: =>
 
 
 
