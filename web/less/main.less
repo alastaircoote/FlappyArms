@@ -1,6 +1,18 @@
 @import "reset.css";
 @import "main-game.css";
 
+@font-face {
+    font-family: 'motorola_screentyperegular';
+    src: url('../assets/motorolascreentype-webfont.eot');
+    src: url('../assets/motorolascreentype-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../assets/motorolascreentype-webfont.woff') format('woff'),
+         url('../assets/motorolascreentype-webfont.ttf') format('truetype'),
+         url('../assets/motorolascreentype-webfont.svg#motorola_screentyperegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 html {
   height: 200px;
   overflow: hidden;
@@ -65,17 +77,7 @@ body {
 #game-over button{
   font-size:1.5em
 }
-canvas {
-  display: block;
-  margin:0;
-  position:absolute;
-  top:0;
-  bottom:0;
-  left:0;
-  right:0;
-  width: 100%;
-  height: 100%;
-}
+
 
 body.client {
   #gameholder{
@@ -89,8 +91,7 @@ body.client {
   display:none;
 }
 
-#instruction-box {
-  background: #fff;
+.centerVminBox() {
   width: 90vmin;
   height: 90vmin;
   position: absolute;
@@ -99,17 +100,31 @@ body.client {
   margin-top: -45vmin;
   left:50%;
   margin-left:-45vmin;
-  border: solid 5px #ccc;
-  font-family: "Press Start 2P";
+}
+
+#instruction-box {
+  //background: #fff;
+  .centerVminBox();
+  //border: solid 5px #ccc;
+  //font-family: "Press Start 2P";
   color:#000;
-  //-webkit-transition: opacity 0.5s ease-in;
-  //transition: opacity 0.5s ease-in;
+  font-size: 2.7vmin;
+  line-height: 1.2em;
+
+  img {
+    width: 55vmin;
+    height: 43.72vmin;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 6vmin;
+  }
 
   h1 {
     margin: 5vmin 0;
     text-align: center;
     font-size: 10vmin;
     font-weight: normal;
+    display:none;
   }
 
   h3 {
@@ -119,11 +134,9 @@ body.client {
   }
 
   p {
-    font-family: "Press Start 2P";
+    font-family: "motorola_screentyperegular";
     margin: 0 4vmin;
-    font-size: 2.5vmin;
     text-align: center;
-    line-height: 1.2em;
   }
 
   body.ipad & {
@@ -132,6 +145,130 @@ body.client {
   }
   
 }
+
+.redbox {
+  background-color: #BB3316;
+  color:#fff;
+  
+  border: solid 1vmin #D13125;
+  border-width: 0.7vmin 0px 0px 0.7vmin;
+  font-family: "motorola_screentyperegular";
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+
+  div.inner {
+    border: solid 1vmin #8C1616;
+    border-width: 0px 0.7vmin 0.7vmin 0px;
+    padding: 3vmin;
+  }
+}
+
+#intro {
+  
+
+  
+
+  a {
+    color: #C0A49B;
+    text-decoration: none;
+  }
+
+  p {
+    margin:0;
+    //font-size: 24px;
+  }
+
+  ol, li {
+    list-style: none;
+  }
+  li {
+    display: inline-block;
+    width: 49%;
+    padding-left: 10vmin;
+    margin-bottom: 4vmin;
+    cursor: pointer;
+    font-size: 4vmin;
+    position: relative;
+    
+    height: 4vmin;
+    line-height: 4vmin;
+
+    &.selected {
+      text-decoration: underline;
+      background: url("../assets/anim-bird.gif") no-repeat;
+      background-size: auto 100%;
+    }
+  }
+
+  ol {
+    margin: 5vmin 0 1vmin; 
+  }
+}
+
+#connect-box {
+  display: none;
+  .centerVminBox();
+  p {
+      font-size: 4vmin;
+      line-height: 5vmin;
+
+    }
+  #connect-top {
+    h3 {
+      float:right;
+      font-size: 10vmin;
+      text-align: center;
+      width: 27vmin;
+      height: 10vmin;
+      //margin-left: 2vmin;
+    }
+    
+  }
+
+  .playerbox {
+    margin: 3vmin 0;
+
+    .birdicon {
+      float:left;
+      width: 7vmin;
+      height: 5vmin;
+      margin-right: 3vmin;
+    }
+
+    .flapboxes {
+      float:right;
+      width: 18vmin;
+      div {
+        height: 5vmin;
+        background:black;
+        width: 5vmin;
+        display: inline-block;
+        margin-right: 1vmin;
+      }
+    }
+
+    &.orig .flapboxes div.active {
+      background: #F8B733;
+    }
+
+    &.red .flapboxes div.active {
+      background: #FA918B;
+    }
+
+    &.blue .flapboxes div.active {
+      background: #3276F8;
+    }
+
+    &.green .flapboxes div.active {
+      background: #4FE02B;
+    }
+  }
+
+  
+
+
+}
+
 
 #gamecontainer, #instruction-box {
   display: none;
@@ -289,3 +426,15 @@ body.touched {
   height: 40vmin;
   overflow-y: scroll;
 }
+
+canvas {
+  image-rendering: optimizeSpeed;             // Older versions of FF
+    image-rendering: -moz-crisp-edges;          // FF 6.0+
+    image-rendering: -webkit-optimize-contrast; // Webkit
+                                                //  (Safari now, Chrome soon)
+    image-rendering: -o-crisp-edges;            // OS X & Windows Opera (12.02+)
+    image-rendering: optimize-contrast;         // Possible future browsers.
+    -ms-interpolation-mode: nearest-neighbor;   // IE
+}
+
+@import "birds.less";

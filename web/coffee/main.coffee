@@ -2,6 +2,7 @@ requirejs
     paths:
         jquery: "//code.jquery.com/jquery-1.11.0.min"
         socket: "//actuallyflaptho.alastair.is/socket.io/socket.io"
+        image: "libs/require-image"
 
     shim:
         "game/main":
@@ -21,7 +22,7 @@ requirejs
 
 
 require ['tap-client', 'tap-server'], (Client,Server) ->
-    console.log Modernizr.touch
+
     if /iPad/.test(window.navigator.userAgent)
         $("body").addClass("ipad")
         $("body").css "height", "672px"

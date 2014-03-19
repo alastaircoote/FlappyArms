@@ -12,77 +12,47 @@
     <body>
     <script src="js/game/buzz.min.js"></script>
     <script src="js/libs/require.js" data-main="js/main.js"></script>
-    <!--
-    <script src="js/modernizr.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="js/gyro.js"></script>
-    <script src="js/index-new.js"></script>
-    <script>
-    document.write('<script src="http://actuallyflaptho.alastair.is/socket.io/socket.io.js"></sc' + 'ript>')
-    </script>
     
-    <script>comm = {}</script>
-    <script src="js/tap-server.js"></script>
-    <script src="js/tap-client.js"></script>
-    <script>
-        if (Modernizr.touch) {
-            comm.client();
-        } else {
-            comm.server();
-        }
-    </script>-->
-<div id="gamecontainer">
-  <div id="infobutton">Info</div>
-  <div id="infobox">
-
-  </div>
-         <div id="gamescreen">
-            <div id="sky" class="animated">
-               <div id="flyarea">
-                  <div id="ceiling" class="animated"></div>
-                  <!-- This is the flying and pipe area container -->
-                  <div id="player" class="bird animated"></div>
-                  
-                  <div id="bigscore"></div>
-                  
-                  <div id="splash"></div>
-                  
-                  <div id="scoreboard">
-                     <div id="medal"></div>
-                     <div id="currentscore"></div>
-                     <div id="highscore"></div>
-                     <div id="replay"><img src="assets/replay.png" alt="replay"></div>
-                  </div>
-                  
-                  <!-- Pipes go here! -->
-               </div>
-            </div>
-            <div id="land" class="animated"><div id="debug"></div></div>
-         </div>
-      </div>
-
   <div id="instruction-box">
+    <img src="assets/logo-big.png"/>
     <h1>Flappy Arms</h1>
-    <div id="intro">
-    <p>You thought Flappy Birds was annoying? Try flapping your arms while you do it. Grab your phone, go to http://bit.ly/flappyarms and enter:</p>
-      <h3 id="numbers">&nbsp;</h3>
-      <p>This is based on <a href="http://nebez.github.io/floppybird/">FloppyBird</a>, and is a very buggy experiment by <a href="http://twitter.com/_alastair">_alastair</a></p>
+    <div id="intro" class="redbox">
+      <div class='inner'>
+      <p>You thought Flappy Bird was annoying? Try flapping your arms while you do it. Grab your phone (and maybe some friends) and get started.</p>
+      <ol>
+        <li class="selected">1 Player</li>
+        <li>2 Players</li>
+        <li>3 Players</li>
+        <li>4 Players</li>
+      </ol>
+        <p>This is based on <a href="http://nebez.github.io/floppybird/">FloppyBird</a>, and is a very buggy experiment by <a href="http://twitter.com/_alastair">_alastair</a>.</p>
+        </div>
     </div>
-    <div id="howtoplay">
-      <p>OK, you're connected. Make sure you have at least one finger touching the your phone screen (don't put it
-        into standby!) and stretch your arms out... and get flapping.</p>
-        <p>Flap successfully three times and the game will start.</p>
-        
+      <!--<div id="howtoplay">
+        <p>OK, you're connected. Make sure you have at least one finger touching the your phone screen (don't put it
+          into standby!) and stretch your arms out... and get flapping.</p>
+          <p>Flap successfully three times and the game will start.</p>
+          
+      </div>
+      <div id="gameover">
+        <p>You scored:</p>
+        <h3 id="score"></h3>
+        <p>Better luck next time. Want to try again? Flap three times:</p>
+      </div>
+      <div id="signals">
+        <div class="signal" id="signal1"></div>
+        <div class="signal" id="signal2"></div>
+        <div class="signal" id="signal3"></div>
+      </div>-->
+  </div>
+  <div id="connect-box">
+    <div class="redbox" id="connect-top">
+      <div class="inner">
+      <h3 id="numbers"></h3>
+        <p>Go to this web site on your phones and enter this code for each player:</p>
+      </div>
     </div>
-    <div id="gameover">
-      <p>You scored:</p>
-      <h3 id="score"></h3>
-      <p>Better luck next time. Want to try again? Flap three times:</p>
-    </div>
-    <div id="signals">
-      <div class="signal" id="signal1"></div>
-      <div class="signal" id="signal2"></div>
-      <div class="signal" id="signal3"></div>
+    <div id="connect-players">
     </div>
   </div>
 

@@ -1,18 +1,39 @@
-define ["jquery","game/main","host-comm","logger"], ($, Birdie, HostCommLayer,Logger) ->
-    class Server
+define [
+    "jquery"
+    "host-comm"
+    "logger"
+    "game-new/game"
+    "server/connect-window"
+    "libs/microevent"
+    ], ($, HostCommLayer, Logger, GameCanvas, ConnectWindow, MicroEvent) ->
+    class Server extends MicroEvent
         constructor: ->
-            @comm = new HostCommLayer()
-            @comm.connect()
-
-            @comm.on "id-received", @receiveId
-            @comm.on "receive", @receive
-            @comm.on "disconnected", @disconnected
-            @comm.on "ping", (ping) ->
-                #$("#spanPing").html(ping)
-                #console.log "ping", ping
+            
+            @connectWindow = new ConnectWindow(@)
 
             $("#gamecontainer, #instruction-box").css "display","block"
-            Birdie()
+            
+            @gc = new GameCanvas({
+                width: $(window).width()
+                height: $(window).height()
+            })
+
+            $("window").on "resize", () =>
+                @gc.setOptions({
+                    width: $(window).width()
+                    height: $(window).height()
+                });
+
+            @gc.el.css
+                position:"absolute"
+                left: "0%"
+                top:0
+
+            $("body").append @gc.el
+
+            @setIntroBox()
+
+
             @flapsSoFar = 0
 
             $("body").on "gameStarted", ->
@@ -28,14 +49,88 @@ define ["jquery","game/main","host-comm","logger"], ($, Birdie, HostCommLayer,Lo
 
             $("#infobutton").on "click", -> $("#infobox").toggle()
 
+        setIntroBox: =>
+            self = this
+            $("#intro").on "mouseover", "li", ->
+                $("#intro li.selected").removeClass("selected")
+                $(this).addClass("selected")
+            $("#intro").on "click", "li", () ->
+                idx = $("#intro li").index(this)
+                self.numOfPlayers = idx + 1
+                self.showConnectWindow()
+            @showIntroBox()
+        
+        showIntroBox: =>   
+            $("body").on "keydown", @introKeypress
+            $("#instruction-box").show()
+
+        showConnectWindow: =>
+            @hideAll()
+            @connectWindow.show()
+            
+            @connectEls = [1..@numOfPlayers].map (i) ->
+
+
+            #$("#connect-box").show()
+            @connect()
+
+        hideAll: =>
+            # Sort of a catch all to disable and hide everything, no
+            # matter where we are.
+            @connectWindow.hide()
+            $("#instruction-box").hide()
+            $("body").off "keydown", @introKeypress
+
+
+        connect: =>
+            @comm = new HostCommLayer()
+            @comm.connect()
+
+            @comm.on "id-received", (id) =>
+                @trigger "id-received", id
+            @comm.on "receive", @receive
+            @comm.on "disconnected", @disconnected
+            @comm.on "ping", (ping) ->
+                #$("#spanPing").html(ping)
+                #console.log "ping", ping
+
+        startGame: (numPlayers) =>
+            console.log numPlayers
+            @hideAll()
+            @gc.addBirds(numPlayers)
+
+
+        introKeypress: (e) ->
+            selected = $("#intro li.selected")
+            lis = $("#intro li")
+            selectedIndex = lis.index selected
+
+            targetEl = null
+
+            if e.keyCode == 32 or e.keyCode == 13
+                return selected.trigger "click"
+
+            if e.keyCode == 38 or e.keyCode == 40
+                if selectedIndex == 0 then targetEl = lis.get(2)
+                if selectedIndex == 1 then targetEl = lis.get(3)
+                if selectedIndex == 2 then targetEl = lis.get(0)
+                if selectedIndex == 3 then targetEl = lis.get(1)
+
+            if e.keyCode == 37 or e.keyCode == 39
+                if selectedIndex == 0 then targetEl = lis.get(1)
+                if selectedIndex == 1 then targetEl = lis.get(0)
+                if selectedIndex == 2 then targetEl = lis.get(3)
+                if selectedIndex == 3 then targetEl = lis.get(2)
+            
+
+            if targetEl
+                selected.removeClass("selected")
+            $(targetEl).addClass("selected")
+
         gotClient: =>
             if $("#gameover").css("display") == "block" then return
             $("#intro").hide()
             $("#howtoplay, #signals").show()
-
-        receiveId: (data) =>
-            @socketId = data
-            $("#numbers").html data
 
         receive: (data) =>
             if data.ev == "toucherated" then @flap(data)

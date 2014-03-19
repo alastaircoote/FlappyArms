@@ -278,13 +278,13 @@ $(document).keydown(function(e){
 $("body").on("flap",function() {
    screenClick()
 })
-/*
+
 //Handle mouse down OR touch start
 if("ontouchstart" in window)
    $(document).on("touchstart", screenClick);
 else
    $(document).on("mousedown", screenClick);
-*/
+
 function screenClick()
 {
    if(currentstate == states.GameScreen)
