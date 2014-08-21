@@ -31,7 +31,7 @@ echo.on 'connection', (socket) ->
         console.log "Searching for #{args.code}"
         hc = Host.get(args.code)
         if !hc
-            return socket.emit "receive", {ev:"no-host"}
+            return sock.send 'no-host'
 
         hc.attachClient sock
 
