@@ -70,7 +70,7 @@ gulp.task("build",function() {
   gulp.src('./assets/**/*').pipe(gulp.dest("./build/assets/"))
   gulp.src('./fonts/*').pipe(gulp.dest("./build/fonts/"))
   gulp.src('./coffee/**/*.coffee').pipe(coffee()).pipe(uglify()).pipe(gulp.dest("./build" + '/js/'));
-  gulp.src('./less/*').pipe(less()).pipe(gulp.dest("./build" + '/css/'));
+  gulp.src('./less/main.less').pipe(less()).pipe(gulp.dest("./build" + '/css/'));
 
  
 

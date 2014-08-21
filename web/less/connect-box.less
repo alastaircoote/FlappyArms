@@ -1,0 +1,102 @@
+@import "funcs.less";
+
+#connect-box {
+
+  display: none;
+
+   body.show-connect & {
+        display:block;
+    }
+
+  .centerVminBox();
+  p {
+      font-size: 4vmin;
+      line-height: 5vmin;
+
+    }
+  #connect-top {
+    h3 {
+      float:right;
+      font-size: 10vmin;
+      text-align: center;
+      width: 27vmin;
+      height: 10vmin;
+      //margin-left: 2vmin;
+    }
+    
+  }
+
+
+}
+
+.playerbox {
+    margin: 3vmin 0;
+
+    .birdicon {
+      float:left;
+      width: 7vmin;
+      height: 5vmin;
+      margin-right: 3vmin;
+    }
+
+    .flapboxes {
+      float:right;
+      width: 18vmin;
+
+      div {
+        height: 5vmin;
+        background:black;
+        width: 5vmin;
+        display: inline-block;
+        margin-right: 1vmin;
+      }
+    }
+
+    &.orig .inner.flapped-1 .flapboxes .flap-1,
+    &.orig .inner.flapped-2 .flapboxes .flap-2,
+    &.orig .inner.flapped-3 .flapboxes .flap-3 {
+      background: #F8B733;
+    }
+
+    &.red .inner.flapped-1 .flapboxes .flap-1,
+    &.red .inner.flapped-2 .flapboxes .flap-2,
+    &.red .inner.flapped-3 .flapboxes .flap-3 {
+      background: #FA918B;
+    }
+
+    &.blue .inner.flapped-1 .flapboxes .flap-1,
+    &.blue .inner.flapped-2 .flapboxes .flap-2,
+    &.blue .inner.flapped-3 .flapboxes .flap-3 {
+      background: #3276F8;
+    }
+
+    &.green .inner.flapped-1 .flapboxes .flap-1,
+    &.green .inner.flapped-2 .flapboxes .flap-2,
+    &.green .inner.flapped-3 .flapboxes .flap-3 {
+      background: #4FE02B;
+    }
+
+    p {
+      display:none;
+    }
+
+    .inner {
+
+      &.waiting-connect {
+        p.initial {display: block}
+        .flapboxes {
+          display: none;
+        }
+      }
+      &.waiting-flaps p.flapthree {display: block}
+      &.ready-to-go {
+        p.ready {
+          display:block;
+        }
+         .flapboxes {
+          display: none;
+        }
+      }
+    }
+
+  }

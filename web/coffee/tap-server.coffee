@@ -43,7 +43,7 @@ define [
             @introBox.on "numPlayersChosen", @playersChosen
             @introBox.show()
             # TODO :remove
-            @playersChosen(2)
+            #@playersChosen(2)
 
             FakePlayer.hookKbEvents()
             @comm.on "got-id", (id) ->
@@ -51,7 +51,7 @@ define [
 
 
             @comm.socket.on 'client-attached', @playerAdded
-            
+
 
         playerAdded: ({clientId}) =>
             for player in @players
