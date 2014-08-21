@@ -42,9 +42,9 @@ define ["jquery","flap","client/player"], ($, flap, Player) ->
 
             @player.connect val
 
-            window.onbeforeunload = () =>
-                @player.disconnect()
-                return 'Are you sure you want to exit the game?'
+            #window.onbeforeunload = () =>
+            #    @player.disconnect()
+            #    return 'Are you sure you want to exit the game?'
 
             return
 

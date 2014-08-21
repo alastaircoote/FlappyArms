@@ -18,7 +18,7 @@ define [
             @comm.onId @socketId, 'flap', =>
                 @trigger "flap", @
 
-
+            @comm.onId @socketId, 'disconnected', @disconnect
             @comm.onId @socketId, 'ping', (data) =>
                 @comm.send @socketId, 'pong', data
             #@comm.socket.on @socketId + ':ping', (data) =>
