@@ -51,8 +51,10 @@ module.exports = class Host
         @sendToHost 'client-attached',{clientId: id}
         @sendToClient id, "host-attached", {peerId: @peerId, clientId: id}
 
-        clientSocket.on "disconnect", => @sendToHost(id + ':disconnected')
-        @hostSocket.on "disconnect", => @sendToClient(id,'disconnected')
+        clientSocket.on "disconnect", =>
+            @clientDisconnected(id)
+        @hostSocket.on "disconnect", =>
+            @hostDisconnected()
 
         clientSocket.on "received", (data) => @sendToHost(data.ev, data.data)
         @hostSocket.on "received", (data) => 
@@ -60,15 +62,13 @@ module.exports = class Host
             if evSplit.length == 2
                 @sendToClient(Number(evSplit[0]),evSplit[1], data.data)
 
-    disconnected: (from) =>
-        return
-        if @alreadyDisconnected == true then return
-        @alreadyDisconnected = true
-        console.log "discon", @hostSocket.disconnected, @clientSocket.disconnected
-        if from == "client" && !@hostSocket.disconnected
-            @hostSocket.disconnect()
-            @hostSocket = null
-        else if !@clientSocket.disconnected
-            @clientSocket.disconnect()
-            @clientSocket = null
+    hostDisconnected: () =>
+        for key, val of @clients
+            @sendToClient key, 'disconnected'
+        @hostSocket.disconnect()
+        @hostSocket = null
         savedSockets.remove @
+
+    clientDisconnected: (id) =>
+        delete @clients[id]
+        @sendToHost 'disconnected', id

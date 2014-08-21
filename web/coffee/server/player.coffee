@@ -54,7 +54,7 @@ define [
             console.log "Player disconnected"
             @id = null
             @trigger "disconnect", @, @index
-            @setIndex(null)
+            @connected = false
 
 
 

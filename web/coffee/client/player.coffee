@@ -32,6 +32,8 @@ define [
                 
                 @peerClient.on 'error', (e) -> console.log e
 
+                @trigger 'connected'
+
 
             @socket.on 'event', @receiveSocketEvent
             @on 'pong', @receivePong

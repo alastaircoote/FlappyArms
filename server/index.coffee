@@ -32,8 +32,6 @@ echo.on 'connection', (socket) ->
         hc = Host.get(args.code)
         if !hc
             return socket.emit "receive", {ev:"no-host"}
-        else if hc.client
-            return socket.emit "receive", {ev:"already-used"}
 
         hc.attachClient sock
 

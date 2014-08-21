@@ -8,6 +8,8 @@ define ["jquery","flap","client/player"], ($, flap, Player) ->
             @player = new Player()
             @player.on 'server-full', @serverFull
             @player.on 'disonnected', -> window.onbeforeunload = null
+            @player.on 'connected', @playerConnected
+            @player.on 'no-host', @noHost
             #@commLayer.on "receive", @receive
             #@commLayer.on "disconnected", @disconnected
             #@commLayer.on "badserver", () => @noHost()
@@ -33,14 +35,18 @@ define ["jquery","flap","client/player"], ($, flap, Player) ->
             #$(window).on "scroll", ->
             #    $(window).scrollTop(0)
 
-        connect: (e) =>
+            if window.location.href.indexOf("?connect=")
+                id = window.location.href.split('?connect=')[1]
+                @connect(null, id)
+
+        connect: (e, forceId) =>
             console.log "do connect"
-            e.preventDefault()
+            if (e) then e.preventDefault()
             val = $('#codenum').val()
             if @isIos
                 val = @currentNum
 
-            @player.connect val
+            @player.connect forceId or val
 
             #window.onbeforeunload = () =>
             #    @player.disconnect()
