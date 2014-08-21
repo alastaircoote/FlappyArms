@@ -6,13 +6,13 @@ SockJSEvented = require "./sockjs-evented"
 #io = require('socket.io').listen(5000)
 {PeerServer} = require('peer')
 Host = require "./hostclient"
-peer = new PeerServer {port: 5001, path: "/"}
+peer = new PeerServer {port: 5011, path: "/"}
 echo = sockjs.createServer()
 
 server = http.createServer()
 echo.installHandlers(server, {prefix:'/flappyarms'})
 
-server.listen(5000, '0.0.0.0')
+server.listen(5010, '0.0.0.0')
 
 peer.on "connection", ->
     #console.log "peer connected"
