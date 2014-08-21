@@ -12,6 +12,9 @@ define ["jquery", "libs/microevent"], ($, MicroEvent) ->
             @createCanvas()
             allCanvases.push @
 
+        @reset: =>
+            allCanvases = []
+
         createCanvas: () =>
             canvas = $("<canvas/>")
             widthToDraw = @width + Math.abs(@moveBy)

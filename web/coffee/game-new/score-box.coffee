@@ -14,6 +14,7 @@ define [
         constructor: () ->
             @$el = $("#score-box")
             @currentNum = 0
+            @$el.html "<img src='assets/font_big_0.png'/>"
 
         increment: () ->
             @currentNum++

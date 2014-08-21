@@ -21,6 +21,16 @@ define [
             @comm.onId @socketId, 'disconnected', @disconnect
             @comm.onId @socketId, 'ping', (data) =>
                 @comm.send @socketId, 'pong', data
+
+            @comm.onId @socketId, 'ping-result', (pr) ->
+                tr = $("#player_#{socketId+1}_info")
+                tr.addClass 'active'
+                if pr.rtc
+                    tr.addClass 'rtc'
+                else
+                    tr.removeClass 'rtc'
+
+                tr.find('td.ping').html pr.time
             #@comm.socket.on @socketId + ':ping', (data) =>
             #    @comm.socket.emit @socketId + ':pong', data
 
@@ -55,7 +65,9 @@ define [
             @id = null
             @trigger "disconnect", @, @index
             @connected = false
-
+            tr = $("#player_#{@socketId+1}_info")
+            tr.attr 'class', ''
+            tr.find('td.ping').html ''
 
 
         @getColorFromIndex: (idx) ->

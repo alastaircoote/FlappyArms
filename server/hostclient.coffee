@@ -36,6 +36,7 @@ module.exports = class Host
         @peerId = id
 
     sendToHost: (ev,data) =>
+        if !@hostSocket then return console.log 'no host for msg', ev, data
         @hostSocket.send ev, data
 
     sendToClient: (id,ev, data) =>
@@ -65,10 +66,10 @@ module.exports = class Host
     hostDisconnected: () =>
         for key, val of @clients
             @sendToClient key, 'disconnected'
-        @hostSocket.disconnect()
         @hostSocket = null
         savedSockets.remove @
 
     clientDisconnected: (id) =>
         delete @clients[id]
-        @sendToHost 'disconnected', id
+
+        @sendToHost id + ':disconnected'

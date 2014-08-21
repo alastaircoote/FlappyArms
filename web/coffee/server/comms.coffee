@@ -13,7 +13,6 @@ define [
 
         connect: =>
             @socket = new SockJSEvented new SockJS @targetSockServer
-            console.log @targetSockServer
             @socket.on 'connect', =>
                 Logger.info "Connected to socket.io server"
                 @socket.emit 'is-host'
@@ -27,7 +26,8 @@ define [
         setId: ({id}) =>
             @id = id
             @trigger 'got-id', @id
-            @peerClient = new Peer id, {host: Servers.webrtc[0].host, port:Servers.webrtc[0].port, debug:3}
+            if !util.supports.data then return
+            @peerClient = new Peer id, {host: Servers.webrtc[0].host, port:Servers.webrtc[0].port}
 
             @peerClient.on 'connection', @rtcActive
 

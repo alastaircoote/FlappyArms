@@ -17,22 +17,33 @@ define [
             "green"
         ]
         constructor: (@opts) ->
+            AnimateCanvas.reset()
             # Pass through here just so we store it once
             PipeCanvas.baseHeight = @baseHeight
             @createEl()
             @createPatterns()
             
+            
+            #@addBirds(4)
             @birds = []
             @pipes = []
-            #@addBirds(4)
-            
-            
             @deadBirds = 0
             @currentScore = 0
+            
 
             @landTop = @landCanvas.top
             @scoreBox = new ScoreBox()
             @animate()
+
+        reset: =>
+            @birds = []
+            @pipes = []
+            @deadBirds = 0
+            @currentScore = 0
+            @pauseTime = null
+            @stopAnimation = false
+            @animate()
+
 
         start: () =>
             PipeCanvas.resetPositions()
@@ -133,7 +144,8 @@ define [
         gameOver: () =>
             @scoreBox.hide()
             @trigger "gameover"
-
+            console.log 'gameover'
+            @stopAnimation = true
 
         animate: =>
             AnimateCanvas.startTime = Date.now()

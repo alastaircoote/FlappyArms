@@ -6,12 +6,10 @@ module.exports = class SockJSEvented extends require('events').EventEmitter
     
     processMsg: (msg) =>
         json = JSON.parse(msg)
-        console.log "receive", json.ev, json.data
         @emit json.ev, json.data
         @emit 'received', json
 
     send: (ev,data) =>
-        console.log "send", ev, data
         jsonString = JSON.stringify
             ev: ev
             data: data

@@ -1,4 +1,4 @@
-define ["libs/microevent"], (MicroEvent) ->
+define ["libs/microevent",'logger'], (MicroEvent, Logger) ->
     class SockJSEvented extends MicroEvent
         constructor: (@socket) ->
             @socket.onmessage = @processMsg
@@ -9,12 +9,12 @@ define ["libs/microevent"], (MicroEvent) ->
         
         processMsg: (e) =>
             json = JSON.parse(e.data)
-            console.log "receive", json.ev, json.data
+            Logger.info "receive", json.ev, json.data
             @trigger json.ev, json.data
             @trigger "event", json.ev, json.data
 
         emit: (ev,data) =>
-            console.log "emit", ev, data
+            Logger.info "emit", ev, data
             jsonString = JSON.stringify
                 ev: ev
                 data: data

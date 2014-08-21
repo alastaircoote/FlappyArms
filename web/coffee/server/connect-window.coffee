@@ -15,33 +15,52 @@ define [
             @server.comm.on "client-connect", @clientConnected
             @server.comm.on "flap", @flap
 
-            @server.players.forEach (p) =>
-                p.on "got-socket", @setPlayer
-                p.on "disconnect", @resetPlayer
-                p.on "flap", @playerFlapped
+            
 
-            @readyPlayers = 0
+            
 
-        show: =>
+        show: ({showScores})=>
             #@$el.show()
             @$playerBox.empty()
-            @playerEls = @server.players.map (p, i) ->
-                inner = $("<div class='inner waiting-connect'></div>")
+            @playerEls = @server.players.map (p, i) =>
+                inner = $("<div class='inner'></div>")
+                if !p.connected
+                    inner.addClass('waiting-connect')
+                else
+                    inner.addClass('waiting-flaps')
+
                 birdIcon = $("<div class='birdicon'/>")
 
                 color = Player.getColorFromIndex(i)
 
                 birdIcon.addClass color + "-bird"
 
+                scoreString = p.score
+                scoreString += if p.score == 1 then ' point' else ' points'
+
                 inner.append birdIcon, """
                     <div class='flapboxes'><div class='flap-1'/><div class='flap-2'/><div class='flap-3'/></div>
-                    <p class='initial'>Waiting for Player #{i+1} to connect...</p>
+                    <p class='initial'>Waiting for Player #{i+1} to connect<span class='normal'>...</span><span class='score'> (code #{@id})</span></p>
                     <p class='flapthree'>Player #{i+1} connected. Flap 3 times!</p>
                     <p class='ready'>You're ready to go!</p>
+                    <p class='score'>#{scoreString}</p>
                 """
                 return $("<div class='redbox playerbox player#{i+1} #{color}'></div>").append(inner)
 
+            if showScores
+                @$el.addClass 'show-scores'
+            else
+                @$el.removeClass 'show-scores'
+
             @$playerBox.append @playerEls
+
+            @server.players.forEach (p) =>
+                p.on "got-socket", @setPlayer
+                p.on "disconnect", @resetPlayer
+                p.on "flap", @playerFlapped
+
+            @readyPlayers = 0
+            @$el.show()
 
 
         setPlayer: (player) =>
@@ -62,6 +81,7 @@ define [
             @$el.hide()
 
         setId: (id) =>
+            @id = id
             $("#numbers").html id
 
         playerFlapped: (player) =>
@@ -69,7 +89,7 @@ define [
             if box.hasClass "flapped-2"
                 box.removeClass("waiting-flaps").addClass("ready-to-go")
                 @readyPlayers++
-                if @readyPlayers == @server.numOfPlayers
+                if @readyPlayers == @server.players.length
                     # a delay so everyone can see what's happening
                     setTimeout () =>
                         @ready()

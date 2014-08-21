@@ -13,6 +13,41 @@
     <script src="js/game/buzz.min.js"></script>
     <script src="js/libs/require.js" data-main="js/main.js"></script>
   <div id='server'>
+  <div id='infobox'>
+    <header>Info</header>
+    <div class='inner'>
+      <table>
+        <tr id='player_1_info'>
+          <td>
+            Player 1
+          </td>
+          <td class='ping'>
+          </td>
+        </tr>
+        <tr id='player_2_info'>
+          <td>
+            Player 2
+          </td>
+          <td class='ping'>
+          </td>
+        </tr>
+        <tr id='player_3_info'>
+          <td>
+            Player 3
+          </td>
+          <td class='ping'>
+          </td>
+        </tr>
+        <tr id='player_4_info'>
+          <td>
+            Player 4
+          </td>
+          <td class='ping'>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
   <div id="instruction-box">
     <img src="assets/logo-big.png"/>
     <h1>Flappy Arms</h1>
@@ -29,28 +64,13 @@
         <p>This is based on <a href="http://nebez.github.io/floppybird/">FloppyBird</a>, and is a very buggy experiment by <a href="http://twitter.com/_alastair">_alastair</a>.</p>
         </div>
     </div>
-      <!--<div id="howtoplay">
-        <p>OK, you're connected. Make sure you have at least one finger touching the your phone screen (don't put it
-          into standby!) and stretch your arms out... and get flapping.</p>
-          <p>Flap successfully three times and the game will start.</p>
-          
-      </div>
-      <div id="gameover">
-        <p>You scored:</p>
-        <h3 id="score"></h3>
-        <p>Better luck next time. Want to try again? Flap three times:</p>
-      </div>
-      <div id="signals">
-        <div class="signal" id="signal1"></div>
-        <div class="signal" id="signal2"></div>
-        <div class="signal" id="signal3"></div>
-      </div>-->
   </div>
   <div id="connect-box">
     <div class="redbox" id="connect-top">
       <div class="inner">
-      <h3 id="numbers"></h3>
-        <p>Go to this web site on your phones and enter this code for each player:</p>
+        <h3 id="numbers"></h3>
+        <p class='intro'>Go to this web site on your phones and enter this code for each player:</p>
+        <p class='scores'>The scores. Want to play again? Flap three times!</p>
       </div>
     </div>
     <div id="connect-players">
@@ -77,8 +97,9 @@
   </div>
 
   <div id="client">
-  <div class='skyback'></div>
+    <div class='skyback'></div>
     <div id="client_intro">
+      
       <img class='logo' src="assets/logo-big.png">
       <p>To play, go to:
       <em>www.flappyarms.sexy</em>
@@ -99,8 +120,9 @@
   <div id="client_play">
     <h1>You're connected</h1>
     <p>Now use your phone as your controller. Just hold at least one finger on your screen
-    (it will turn green), hold it flat with your hand and start flapping your arms!</p>
+    hold it flat with your hand and start flapping your arms!</p>
     <div id="touchtarget">
+      <div id='touch-num'></div>
     </div>
   </div>
 

@@ -23,7 +23,43 @@
       height: 10vmin;
       //margin-left: 2vmin;
     }
+
+    p.scores {
+      display:none;
+    }
     
+  }
+
+  span.score {
+    display:none;
+  }
+
+  &.show-scores {
+    #connect-top {
+      p.scores {
+        display: block;
+      }
+
+      p.intro, #numbers {
+        display: none;
+      }
+    }
+
+    .playerbox .inner.waiting-flaps p.flapthree {
+      display: none;
+    }
+
+    .playerbox .inner.waiting-flaps p.score {
+      display: block;
+    }
+
+    span.score {
+      display:inline;
+    }
+
+    span.normal {
+      display: none;
+    }
   }
 
 

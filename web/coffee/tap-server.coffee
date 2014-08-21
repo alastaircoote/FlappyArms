@@ -12,11 +12,37 @@ define [
     ], ($, Comms, Logger, GameCanvas, ConnectWindow, MicroEvent, IntroBox, Player, ScoreBoard, FakePlayer) ->
     class Server extends MicroEvent
         constructor: ->
-            
+            $('body').addClass 'server'
             #$("#gamecontainer, #instruction-box").css "display","block"
 
             @comm = new Comms()
             
+            @createGame()
+
+            $("window").on "resize", () =>
+                @gc.setOptions({
+                    width: $(window).width()
+                    height: $(window).height()
+                });
+
+            
+
+
+            @introBox = new IntroBox()
+            @introBox.on "numPlayersChosen", @playersChosen
+            @introBox.show()
+            # TODO :remove
+            @playersChosen(2)
+
+            FakePlayer.hookKbEvents()
+            @comm.on "got-id", (id) ->
+                FakePlayer.connectId = id
+
+
+        createGame: =>
+            if @gc
+                @oldGameCanvas = $(@gc.el)
+
             @gc = new GameCanvas({
                 width: $(window).width()
                 height: $(window).height()
@@ -25,40 +51,24 @@ define [
             @gc.on "scored", @gameScored
             @gc.on "gameover", @gameOver
 
-            $("window").on "resize", () =>
-                @gc.setOptions({
-                    width: $(window).width()
-                    height: $(window).height()
-                });
-
             @gc.el.css
                 position:"absolute"
                 left: "0%"
                 top:0
-
-            $("body").append @gc.el
-
-
-            @introBox = new IntroBox()
-            @introBox.on "numPlayersChosen", @playersChosen
-            @introBox.show()
-            # TODO :remove
-            #@playersChosen(2)
-
-            FakePlayer.hookKbEvents()
-            @comm.on "got-id", (id) ->
-                FakePlayer.connectId = id
-
-
-            
+            if @oldGameCanvas
+                $(@gc.el).insertBefore @oldGameCanvas
+            else
+                $('#server').append @gc.el
 
         playerAdded: ({clientId}) =>
+            
             for player in @players
                 if player.connected then continue
 
                 player.attachSocket clientId
                 return
             @comm.send clientId, 'server-full'
+
 
         playersChosen: (num) =>
             @numOfPlayers = num
@@ -71,10 +81,10 @@ define [
             @connectWindow = new ConnectWindow(@)
             
             @connectWindow.on "ready", @startGame
-            @connectWindow.show()
+            @connectWindow.show({})
             @connect()
 
-            $("body").attr "class", "show-connect"
+            $("body").attr "class", "server show-connect"
 
         getPlayerAt: (idx) =>
             for player in @players
@@ -100,11 +110,11 @@ define [
 
         gameOver: () =>
             for player in @players
-                console.log "score", player.index, player.score
                 player.off @flap, @playerFlapped
 
-            $("body").attr "class", "show-scores"
-            new ScoreBoard(@players)
+            @connectWindow.show({showScores:true})
+            $("body").attr "class", "server show-connect"
+            @createGame()
 
         hideAll: =>
             # Sort of a catch all to disable and hide everything, no
@@ -127,19 +137,21 @@ define [
 
             @players.forEach (p) =>
                 p.on "flap", @playerFlapped
+                p.score = 0
                 bird = @gc.addBird()
                 p.bird = bird
 
 
             countdownEl = $("#countdown-box h4")
             countdownEl.html "3"
-            $("body").attr 'class', "show-countdown"
-
+            $("body").attr 'class', "server show-countdown"
+            if @oldGameCanvas then @oldGameCanvas.remove()
             c = 4
             doCountdown = () =>
                 c--
                 if c == 0
-                    $("body").attr 'class', 'play-game'
+                    $("body").attr 'class', 'server play-game'
+
                     return @gc.start()
 
                 countdownEl.html c

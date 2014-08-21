@@ -14,16 +14,16 @@
 }
 
 @import "client.less";
-
+#client, #server {
+  display: none;
+}
 html {
   height: 200px;
   overflow: hidden;
 }
 body {
-  position: absolute;
   overflow: hidden;
-  width:100%;
-  height:100%;
+  background: #4ec0ca;
   top:0;
   left:0;
   margin:0;
@@ -33,8 +33,12 @@ body {
   -ms-user-select: none;
 }
 
-body.client div#server {
-  display: none;
+body.client div#client {
+  display: block;
+}
+
+body.server div#server {
+  display: block
 }
 
 * {
@@ -352,22 +356,6 @@ body.touched {
   font-size: 2vmin;
 }
 
-#infobox {
-  display: none;
-  position: absolute;
-  z-index:20;
-  right:0;
-  top: 6vmin;
-  background: #fff;
-  color:#000;
-  width: 60vmin;
-  font-family: monospace;
-  padding:2vmin;
-  line-height: 1.5em;
-  font-size: 2vmin;
-  height: 40vmin;
-  overflow-y: scroll;
-}
 
 canvas {
   image-rendering: optimizeSpeed;             // Older versions of FF
@@ -392,6 +380,46 @@ canvas {
     height: 10vmin;
     display: inline-block;
     margin-right: -1.5vmin;
+  }
+}
+
+#infobox {
+  position: absolute;
+  top:0;
+  right:0;
+  z-index:10;
+  font-family: 'motorola_screentyperegular';
+  header {
+    font-size: 16px;
+    background: #fff;
+    padding: 10px 20px;
+    color:#000;
+    cursor:pointer;
+    float:right;
+  }
+
+  table {
+    width: 200px;
+    background: #fff;
+    color:#000;
+  }
+
+  td {
+    padding: 10px 10px;
+    font-size: 20px;
+  }
+
+  tr.active {
+    background:red;
+    color:#fff;
+  }
+
+  td.ping {
+    text-align: right;
+  }
+
+  tr.rtc {
+    background: green;
   }
 }
 
