@@ -19,13 +19,14 @@ savedSockets = {
 }
 
 
-module.exports = class HostClient
+module.exports = class Host
     @get: (id) ->
         return savedSockets.get(id)
 
     constructor: (@hostSocket) ->
         @id = savedSockets.add @
-        @sendToHost {ev: "receive-id", id: @id,serverTime: Date.now()}
+        @clients = {}
+        @sendToHost "receive-id", {id: @id}
         @hostSocket.on "attach-peerid", @attachPeerId
 
     attachPeerId: (id) =>
@@ -34,23 +35,33 @@ module.exports = class HostClient
         console.log "Storing peer ID", id
         @peerId = id
 
-    sendToHost: (data) =>
-        @hostSocket.emit "receive", data
+    sendToHost: (ev,data) =>
+        @hostSocket.send ev, data
 
-    sendToClient: (data) =>
-        @clientSocket.emit "receive", data
+    sendToClient: (id,ev, data) =>
+        @clients[id].send ev, data
 
-    attachClient: (@clientSocket) =>
-        @sendToHost {ev: "client-attached"}
-        @sendToClient {ev: "host-attached", peerId: @peerId, serverTime: Date.now()}
+    attachClient: (clientSocket) =>
+        id = 0
+        while @clients[id]
+            id++
 
-        @clientSocket.on "disconnect", => @disconnected("client")
+        @clients[id] = clientSocket
+
+        @sendToHost 'client-attached',{clientId: id}
+        @sendToClient id, "host-attached", {peerId: @peerId, clientId: id}
+
+        clientSocket.on "disconnect", => @disconnected("client")
         @hostSocket.on "disconnect", => @disconnected("host")
 
-        @clientSocket.on "send", (data) => @sendToHost(data)
-        @hostSocket.on "send", (data) => @sendToClient(data)
+        clientSocket.on "received", (data) => @sendToHost(data.ev, data.data)
+        @hostSocket.on "received", (data) => 
+            evSplit = data.ev.split(':')
+            if evSplit.length == 2
+                @sendToClient(Number(evSplit[0]),evSplit[1], data.data)
 
     disconnected: (from) =>
+        return
         if @alreadyDisconnected == true then return
         @alreadyDisconnected = true
         console.log "discon", @hostSocket.disconnected, @clientSocket.disconnected

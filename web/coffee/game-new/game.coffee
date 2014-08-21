@@ -4,9 +4,11 @@ define [
     "./bird-canvas"
     "./pipe-canvas"
     "image!assets/land.png"
-    "image!assets/sky.png"
-], ($, AnimateCanvas, BirdCanvas, PipeCanvas, landImage, skyImage) ->
-    class Game
+    "image!assets/sky.png",
+    "./score-box",
+    "libs/microevent"
+], ($, AnimateCanvas, BirdCanvas, PipeCanvas, landImage, skyImage, ScoreBox, MicroEvent) ->
+    class Game extends MicroEvent
         baseHeight: 460
         colors: [
             null
@@ -26,34 +28,31 @@ define [
             
             
             @deadBirds = 0
+            @currentScore = 0
 
             @landTop = @landCanvas.top
-            ###
-            $("body").one "click", () =>
-                @addPipe()
-                $("body").on "click", () =>
-                    @birds[0].flap()
-                $("body").on "keypress", () =>
-                    @birds[1].flap()
-
-                @birds.forEach (b) -> b.start();
-
-            ###
-
+            @scoreBox = new ScoreBox()
             @animate()
 
-        addBirds: (i) =>
-            [1..i].map => @addBird()
-
-            for bird, x in @birds
-                bird.top = bird.top - (bird.height * x)
+        start: () =>
+            PipeCanvas.resetPositions()
+            @birds.forEach (b) -> b.start()
+            @addPipe()
+            @scoreBox.show()
 
         addBird: () =>
             self = this
             bird = new BirdCanvas(@, @colors[@birds.length])
             bird.on "dead", () ->
                 self.birdDied this
+
+            bird.top += bird.height * @birds.length
             @birds.push bird
+
+            return bird
+
+        flapBird: (i) =>
+            @birds[i].flap()
 
         setOptions = (@opts) =>
             @calcSize()
@@ -77,6 +76,7 @@ define [
 
         createPatterns: =>
             landHeight = landImage.height - 60
+            PipeCanvas.drawHeight = @baseHeight - landHeight
             @landCanvas = new AnimateCanvas
                 width: @calcWidth
                 height: landHeight
@@ -101,6 +101,7 @@ define [
                 top:0
                 left: @calcWidth
                 moveBy: -(@calcWidth + PipeCanvas.width)
+                pointPosition: 60
                 }, @
 
             newPipe.on "animationComplete", @pipeDone
@@ -110,23 +111,28 @@ define [
             @pipes.push newPipe 
 
         pipeDone: () =>
-            console.log "pipe done"
             @pipes.splice 0, 1
             #@addPipe()
 
+        scored: () =>
+            PipeCanvas.upLevel()
+            @scoreBox.increment()
+            @trigger "scored"
+
         hitCheck: () =>
-            oldFill = @context.fillStyle
-            @context.fillStyle = "blue"
-            @context.fillRect 0,0,20,20
-            @context.fillStyle = oldFill
             @pipes[0].hitCheck @birds.filter (b) -> b.status == "alive"
 
         birdDied: (bird) =>
             # Do not eat
             @deadBirds++
             if @deadBirds == @birds.length
-
                 @pauseTime = Date.now()
+                bird.on "deadcomplete", () =>
+                    setTimeout @gameOver, 500
+
+        gameOver: () =>
+            @scoreBox.hide()
+            @trigger "gameover"
 
 
         animate: =>

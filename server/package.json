@@ -10,6 +10,8 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "socket.io": "~0.9.16",
-    "peer": "^0.2.3"
+    "peer": "^0.2.3",
+    "sockjs": "~0.3.8",
+    "rbytes": "~1.0.0"
   }
 }

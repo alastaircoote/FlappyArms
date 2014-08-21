@@ -4,6 +4,7 @@ define ["jquery", "libs/microevent"], ($, MicroEvent) ->
 
     class AnimateCanvas extends MicroEvent
         moveByPosition: 0
+        scale: 1
         constructor: (opts) ->
             @startTime = Date.now()
             for key, val of opts
@@ -15,9 +16,10 @@ define ["jquery", "libs/microevent"], ($, MicroEvent) ->
             canvas = $("<canvas/>")
             widthToDraw = @width + Math.abs(@moveBy)
             canvas.attr
-                width: widthToDraw
-                height: @height
+                width: widthToDraw * @scale
+                height: @height * @scale
             context = canvas[0].getContext("2d")
+            context.scale @scale, @scale
             context.rect 0, 0, widthToDraw, @height
             context.fillStyle = context.createPattern(@image,"repeat")
             context.fill()

@@ -1,6 +1,6 @@
 @import "reset.css";
 @import "main-game.css";
-
+@import "funcs.less";
 @font-face {
     font-family: 'motorola_screentyperegular';
     src: url('../assets/motorolascreentype-webfont.eot');
@@ -91,22 +91,20 @@ body.client {
   display:none;
 }
 
-.centerVminBox() {
-  width: 90vmin;
-  height: 90vmin;
-  position: absolute;
-  z-index:10;
-  top:50%;
-  margin-top: -45vmin;
-  left:50%;
-  margin-left:-45vmin;
-}
+
 
 #instruction-box {
   //background: #fff;
   .centerVminBox();
   //border: solid 5px #ccc;
   //font-family: "Press Start 2P";
+
+  display:none;
+
+  body.show-intro & {
+    display: block;
+  }
+
   color:#000;
   font-size: 2.7vmin;
   line-height: 1.2em;
@@ -205,69 +203,7 @@ body.client {
   }
 }
 
-#connect-box {
-  display: none;
-  .centerVminBox();
-  p {
-      font-size: 4vmin;
-      line-height: 5vmin;
 
-    }
-  #connect-top {
-    h3 {
-      float:right;
-      font-size: 10vmin;
-      text-align: center;
-      width: 27vmin;
-      height: 10vmin;
-      //margin-left: 2vmin;
-    }
-    
-  }
-
-  .playerbox {
-    margin: 3vmin 0;
-
-    .birdicon {
-      float:left;
-      width: 7vmin;
-      height: 5vmin;
-      margin-right: 3vmin;
-    }
-
-    .flapboxes {
-      float:right;
-      width: 18vmin;
-      div {
-        height: 5vmin;
-        background:black;
-        width: 5vmin;
-        display: inline-block;
-        margin-right: 1vmin;
-      }
-    }
-
-    &.orig .flapboxes div.active {
-      background: #F8B733;
-    }
-
-    &.red .flapboxes div.active {
-      background: #FA918B;
-    }
-
-    &.blue .flapboxes div.active {
-      background: #3276F8;
-    }
-
-    &.green .flapboxes div.active {
-      background: #4FE02B;
-    }
-  }
-
-  
-
-
-}
 
 
 #gamecontainer, #instruction-box {
@@ -437,4 +373,23 @@ canvas {
     -ms-interpolation-mode: nearest-neighbor;   // IE
 }
 
+#score-box {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 20%;
+  margin-top: -18px;
+  z-index:10;
+  display: none;
+
+  img {
+    height: 10vmin;
+    display: inline-block;
+    margin-right: -1.5vmin;
+  }
+}
+
 @import "birds.less";
+@import "connect-box.less";
+@import "countdown-box.less";
+@import "scoreboard.less";

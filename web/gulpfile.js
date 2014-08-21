@@ -38,11 +38,15 @@ gulp.task('compile-coffee', function() {
 });
 
 gulp.task('compile-less', function() {
-  gulp.src('./less/*').pipe(watch()).pipe(less()).pipe(gulp.dest("./tmp" + '/css/')).pipe(livereload(server));
+  gulp.src('./less/main.less').pipe(less()).pipe(gulp.dest("./tmp" + '/css/')).pipe(livereload(server));
 });
 
+gulp.task('watch-less', function() {
+  gulp.watch("./less/*",['compile-less'])
+})
 
-gulp.task('watchtasks', ['lr-listen','copy-static', 'compile-coffee', 'compile-less']);
+
+gulp.task('watchtasks', ['lr-listen','copy-static', 'compile-coffee', 'watch-less']);
 
 gulp.task("watch",["watchtasks"],function() {
     http.createServer(

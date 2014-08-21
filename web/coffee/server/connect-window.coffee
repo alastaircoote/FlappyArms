@@ -1,40 +1,62 @@
-define ["jquery"], ($) ->
-    class ConnectWindow
+define [
+    "jquery"
+    "server/player"
+    "libs/microevent"
+], ($, Player) ->
+    class ConnectWindow extends MicroEvent
         constructor: (@server) ->
             @$el = $("#connect-box")
             @$playerBox = $("#connect-players")
 
-            @server.on "id-received", @setId
-
             @playerIDs = []
             @playersReady = 0
 
+            @server.comm.on "got-id", @setId
+            @server.comm.on "client-connect", @clientConnected
+            @server.comm.on "flap", @flap
+
+            @server.players.forEach (p) =>
+                p.on "got-socket", @setPlayer
+                p.on "disconnect", @resetPlayer
+                p.on "flap", @playerFlapped
+
+            @readyPlayers = 0
+
         show: =>
-            @$el.show()
+            #@$el.show()
             @$playerBox.empty()
-            @playerEls = [1..@server.numOfPlayers].map (i) ->
-                inner = $("<div class='inner'></div>")
+            @playerEls = @server.players.map (p, i) ->
+                inner = $("<div class='inner waiting-connect'></div>")
                 birdIcon = $("<div class='birdicon'/>")
-                color = "orig"
-                switch i
-                    when 2 then color = "red"
-                    when 3 then color = "blue"
-                    when 4 then color = "green"
+
+                color = Player.getColorFromIndex(i)
 
                 birdIcon.addClass color + "-bird"
 
-                inner.append birdIcon, "<p>Waiting for Player #{i} to connect...</p>"
-                return $("<div class='redbox playerbox player#{i} #{color}'></div>").append(inner)
+                inner.append birdIcon, """
+                    <div class='flapboxes'><div class='flap-1'/><div class='flap-2'/><div class='flap-3'/></div>
+                    <p class='initial'>Waiting for Player #{i+1} to connect...</p>
+                    <p class='flapthree'>Player #{i+1} connected. Flap 3 times!</p>
+                    <p class='ready'>You're ready to go!</p>
+                """
+                return $("<div class='redbox playerbox player#{i+1} #{color}'></div>").append(inner)
 
             @$playerBox.append @playerEls
 
-            # DUMMY
-            @clientConnected(1)
-          
 
-            @flap(1)
-            @flap(1)
-            @flap(1)
+        setPlayer: (player) =>
+            box = $('.inner', @playerEls[player.index])
+            $(".birdicon",box).addClass "anim"
+            box.removeClass("waiting-connect").addClass("waiting-flaps")
+            #$(".inner",box).prepend "<div class='flapboxes'><div/><div/><div/></div>"
+
+        resetPlayer: (player, idx) =>
+            box = $(".inner", @playerEls[idx])
+            if box.hasClass("flapped-2")
+                @readyPlayers--
+            box.attr("class","inner waiting-connect")
+            $(".birdicon",box).removeClass "anim"
+            
 
         hide: =>
             @$el.hide()
@@ -42,11 +64,30 @@ define ["jquery"], ($) ->
         setId: (id) =>
             $("#numbers").html id
 
-            # Now it's guaranteed to be there
-            @comm = @server.comm
-            @comm.on "client-connect", @clientConnected
-            @comm.on "flap", @flap
+        playerFlapped: (player) =>
+            box = $('.inner',@playerEls[player.index])
+            if box.hasClass "flapped-2"
+                box.removeClass("waiting-flaps").addClass("ready-to-go")
+                @readyPlayers++
+                if @readyPlayers == @server.numOfPlayers
+                    # a delay so everyone can see what's happening
+                    setTimeout () =>
+                        @ready()
+                        
+                    , 1000
+            else if box.hasClass "flapped-1"
+                box.addClass "flapped-2"
+            else
+                box.addClass "flapped-1"
 
+        ready: =>
+            @server.players.forEach (p) =>
+                p.off "got-index", @setPlayer
+                p.off "disconnect", @resetPlayer
+                p.off "flap", @playerFlapped
+            @trigger "ready"
+            
+        ###
         clientConnected: (clientId) =>
             box = $(@playerEls[@playerIDs.length])
             $(".birdicon",box).addClass "anim"
@@ -67,11 +108,6 @@ define ["jquery"], ($) ->
                 @playersReady++
                 if @playersReady == @playerIDs.length
                     @allPlayersReady()
-
-        allPlayersReady: =>
-
-
-
-
+        ###
 
 

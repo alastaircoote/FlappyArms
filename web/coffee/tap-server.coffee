@@ -1,22 +1,29 @@
 define [
     "jquery"
-    "host-comm"
+    "server/comms"
     "logger"
     "game-new/game"
     "server/connect-window"
     "libs/microevent"
-    ], ($, HostCommLayer, Logger, GameCanvas, ConnectWindow, MicroEvent) ->
+    "server/intro-box"
+    "server/player"
+    "server/score-board"
+    "server/fake-player"
+    ], ($, Comms, Logger, GameCanvas, ConnectWindow, MicroEvent, IntroBox, Player, ScoreBoard, FakePlayer) ->
     class Server extends MicroEvent
         constructor: ->
             
-            @connectWindow = new ConnectWindow(@)
+            #$("#gamecontainer, #instruction-box").css "display","block"
 
-            $("#gamecontainer, #instruction-box").css "display","block"
+            @comm = new Comms()
             
             @gc = new GameCanvas({
                 width: $(window).width()
                 height: $(window).height()
             })
+
+            @gc.on "scored", @gameScored
+            @gc.on "gameover", @gameOver
 
             $("window").on "resize", () =>
                 @gc.setOptions({
@@ -31,48 +38,73 @@ define [
 
             $("body").append @gc.el
 
-            @setIntroBox()
+
+            @introBox = new IntroBox()
+            @introBox.on "numPlayersChosen", @playersChosen
+            @introBox.show()
+            # TODO :remove
+            @playersChosen(2)
+
+            FakePlayer.hookKbEvents()
+            @comm.on "got-id", (id) ->
+                FakePlayer.connectId = id
 
 
-            @flapsSoFar = 0
-
-            $("body").on "gameStarted", ->
-                $("#bigscore").show()
-                $("#instruction-box").hide()
-                $("#howtoplay, #intro, h1").hide()
-
-            $("body").on "gameover", @gameover
-
-            Logger.on "info", (msg) ->
-                $("#infobox").append $("<p/>").html(msg)
-                $("#infobox").scrollTop 99999
-
-            $("#infobutton").on "click", -> $("#infobox").toggle()
-
-        setIntroBox: =>
-            self = this
-            $("#intro").on "mouseover", "li", ->
-                $("#intro li.selected").removeClass("selected")
-                $(this).addClass("selected")
-            $("#intro").on "click", "li", () ->
-                idx = $("#intro li").index(this)
-                self.numOfPlayers = idx + 1
-                self.showConnectWindow()
-            @showIntroBox()
-        
-        showIntroBox: =>   
-            $("body").on "keydown", @introKeypress
-            $("#instruction-box").show()
-
-        showConnectWindow: =>
-            @hideAll()
-            @connectWindow.show()
+            @comm.socket.on 'client-attached', @playerAdded
             
-            @connectEls = [1..@numOfPlayers].map (i) ->
 
+        playerAdded: ({clientId}) =>
+            for player in @players
+                if player.connected then continue
 
-            #$("#connect-box").show()
+                player.attachSocket clientId
+                break
+
+        playersChosen: (num) =>
+            @numOfPlayers = num
+            # The player instances, unordered
+            @players = [0...num].map (i) =>
+                p = new Player(@comm, i)
+                p.on "connect", @playerConnected
+                p.on "disconnect", @playerDisconnected
+                return p
+            @connectWindow = new ConnectWindow(@)
+            
+            @connectWindow.on "ready", @startGame
+            @connectWindow.show()
             @connect()
+
+            $("body").attr "class", "show-connect"
+
+        getPlayerAt: (idx) =>
+            for player in @players
+                if player.index == idx then return player
+
+            return null
+
+        playerConnected: (player) =>
+            for i in [0..@numOfPlayers]
+                console.log "trying player at #{i}"
+                if @getPlayerAt(i) then continue
+
+                player.setIndex(i)
+                break
+
+        playerDisconnected: (player) =>
+
+
+        gameScored: () =>
+            for player in @players
+                if player.bird.status != "alive" then continue
+                player.score++
+
+        gameOver: () =>
+            for player in @players
+                console.log "score", player.index, player.score
+                player.off @flap, @playerFlapped
+
+            $("body").attr "class", "show-scores"
+            new ScoreBoard(@players)
 
         hideAll: =>
             # Sort of a catch all to disable and hide everything, no
@@ -83,55 +115,45 @@ define [
 
 
         connect: =>
-            @comm = new HostCommLayer()
             @comm.connect()
 
-            @comm.on "id-received", (id) =>
-                @trigger "id-received", id
-            @comm.on "receive", @receive
-            @comm.on "disconnected", @disconnected
-            @comm.on "ping", (ping) ->
-                #$("#spanPing").html(ping)
-                #console.log "ping", ping
+        playerFlapped: (player) =>
+            player.bird.flap()
 
-        startGame: (numPlayers) =>
-            console.log numPlayers
+        startGame: () =>
             @hideAll()
-            @gc.addBirds(numPlayers)
+
+            @players.forEach (p) =>
+                p.on "flap", @playerFlapped
+                bird = @gc.addBird()
+                p.bird = bird
 
 
-        introKeypress: (e) ->
-            selected = $("#intro li.selected")
-            lis = $("#intro li")
-            selectedIndex = lis.index selected
+            countdownEl = $("#countdown-box h4")
+            countdownEl.html "3"
+            $("body").attr 'class', "show-countdown"
 
-            targetEl = null
+            c = 4
+            doCountdown = () =>
+                c--
+                if c == 0
+                    $("body").attr 'class', 'play-game'
+                    return @gc.start()
 
-            if e.keyCode == 32 or e.keyCode == 13
-                return selected.trigger "click"
+                countdownEl.html c
+                setTimeout doCountdown, 1000
 
-            if e.keyCode == 38 or e.keyCode == 40
-                if selectedIndex == 0 then targetEl = lis.get(2)
-                if selectedIndex == 1 then targetEl = lis.get(3)
-                if selectedIndex == 2 then targetEl = lis.get(0)
-                if selectedIndex == 3 then targetEl = lis.get(1)
+            doCountdown()
 
-            if e.keyCode == 37 or e.keyCode == 39
-                if selectedIndex == 0 then targetEl = lis.get(1)
-                if selectedIndex == 1 then targetEl = lis.get(0)
-                if selectedIndex == 2 then targetEl = lis.get(3)
-                if selectedIndex == 3 then targetEl = lis.get(2)
-            
+            #@gc.start()
 
-            if targetEl
-                selected.removeClass("selected")
-            $(targetEl).addClass("selected")
-
+        
+        ###
         gotClient: =>
             if $("#gameover").css("display") == "block" then return
             $("#intro").hide()
             $("#howtoplay, #signals").show()
-
+        
         receive: (data) =>
             if data.ev == "toucherated" then @flap(data)
             if data.ev == "client-attached" then @gotClient()
@@ -150,7 +172,7 @@ define [
             else
                 $("body").trigger "flap"
 
-
+        
         gameover: (e, score) =>
             $("#bigscore").hide()
             $("#score").html score
@@ -167,3 +189,4 @@ define [
             $("#howtoplay, #signals, #gameover").hide()
             $("body").trigger "resetgame"
             @comm.connect()
+        ###

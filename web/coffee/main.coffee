@@ -1,6 +1,6 @@
 requirejs
     paths:
-        jquery: "//code.jquery.com/jquery-1.11.0.min"
+        jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min"
         socket: "//actuallyflaptho.alastair.is/socket.io/socket.io"
         image: "libs/require-image"
 
@@ -19,6 +19,8 @@ requirejs
             exports: "io"
         "libs/peer":
             exports: "Peer"
+        "libs/sockjs.min":
+            exports: "SockJS"
 
 
 require ['tap-client', 'tap-server'], (Client,Server) ->

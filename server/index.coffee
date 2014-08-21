@@ -1,41 +1,41 @@
-io = require('socket.io').listen(5000)
+http = require "http"
+sockjs = require "sockjs"
+SockJSEvented = require "./sockjs-evented"
+
+
+#io = require('socket.io').listen(5000)
 {PeerServer} = require('peer')
-HostClient = require "./hostclient"
+Host = require "./hostclient"
 peer = new PeerServer {port: 5001, path: "/"}
+echo = sockjs.createServer()
+
+server = http.createServer()
+echo.installHandlers(server, {prefix:'/flappyarms'})
+
+server.listen(5000, '0.0.0.0')
 
 peer.on "connection", ->
-    console.log "peer connected"
+    #console.log "peer connected"
 
 peer.on "disconnection", ->
     console.log "peer disconnected"
 
-io.set( 'origins', '*:*' )
 
-io.sockets.on 'connection', (socket) ->
+echo.on 'connection', (socket) ->
 
-    socket.on "is-host", () ->
-
-        hc = new HostClient(socket)
-
-        ###
-        entry = savedSockets.filter((s) => s.socket.id == this.id)[0]
-        code = Math.round(Math.random() * 1000)
-        while savedSockets.filter((s) -> s.hostCode == code).length > 0
-            # Get new ID
-            code = Math.round(Math.random() * 1000)
-
-        entry.code = code
-        socket.emit "send-id", code
-        ###
-    socket.on "is-client", (args) ->
+    sock = new SockJSEvented(socket)
+    sock.on "is-host", (args) ->
+        console.log "Creating new host"
+        hc = new Host(sock)
+    sock.on "is-client", (args) ->
         console.log "Searching for #{args.code}"
-        hc = HostClient.get(args.code)
+        hc = Host.get(args.code)
         if !hc
             return socket.emit "receive", {ev:"no-host"}
         else if hc.client
             return socket.emit "receive", {ev:"already-used"}
 
-        hc.attachClient socket
+        hc.attachClient sock
 
         ###
         console.log "Looking for host" + parseInt(args.code.substr(1)) + " in "

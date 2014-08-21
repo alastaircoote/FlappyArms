@@ -29,6 +29,7 @@ define [
             @rotation = 0
             
             @status = "alive"
+            @sentDeathNotification = false
             @left = @startLeft
             @top = @startTop
 
@@ -69,7 +70,11 @@ define [
         deadBirdFall: () =>
 
             fallTarget = @game.landTop - @height + 5
-            if @top == fallTarget then return
+            if @top == fallTarget
+                if !@sentDeathNotification
+                    @sentDeathNotification = true
+                    @trigger "deadcomplete"
+                return 
 
             distanceToFall = @game.landTop - @hitArea.bottom 
             timeToFall = distanceToFall * 40
@@ -89,7 +94,7 @@ define [
 
             if @top > fallTarget
                 @top = fallTarget
-                console.log "dead complete"
+                @trigger "deadcomplete"
             
         calculateHitArea: () =>
             hitwidth = @width - (Math.sin(Math.abs(@rotation) / 90) * 8)

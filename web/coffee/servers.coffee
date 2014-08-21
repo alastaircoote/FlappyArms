@@ -1,11 +1,11 @@
 define () ->
     return {
         socketio: [
-           'http://actuallyflaptho.alastair.is:80'
-           #'http://10.51.203.189:5000'
+           #'http://actuallyflaptho.alastair.is:80'
+           'http://localhost:5000/flappyarms'
         ]
         webrtc: [
-            #'10.51.203.189'
-            'actuallyflaptho.alastair.is'
+            'localhost'
+            #'actuallyflaptho.alastair.is'
         ]
     }

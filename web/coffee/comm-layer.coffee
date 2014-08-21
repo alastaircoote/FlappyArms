@@ -1,14 +1,15 @@
 define [
     "libs/peer"
-    "libs/socketio"
+    "libs/sockjs.min",
+    "sockjs-microevented"
     "servers"
     "libs/microevent"
     "logger"
-], (Peer, io, servers, MicroEvent, Logger) ->
+], (Peer, SockJS, SockMicro, servers, MicroEvent, Logger) ->
     class CommLayer extends MicroEvent
         SupportsWebRTC: util.supports.data
         constructor: () ->
-            @on "receive", @logHeartbeat
+            @on "receive-id", @receiveId
         connectSocketIO: (idx) =>
             @serverIndex = idx
             targetServer = servers.socketio[idx]
@@ -16,13 +17,19 @@ define [
                 return @trigger "badserver"
             Logger.info "Mapped socket.io server index #{idx} to #{targetServer}"
 
-            @socket = io.connect targetServer
+            @socket = new SockMicro new SockJS(targetServer)
             @socket.on "receive",(data) =>  @receiveSocket(data)
             @socket.on "disconnect", () => @socketDisconnected()
             @socket.on "connect", =>
                 Logger.info "Connected to socket.io server"
                 @trigger "socketio-connected"
                 @connectWebRTC()
+            @socket.on "event", (ev, data) =>
+                @trigger ev, data
+
+        receiveId: (data) ->
+            @id = String(@serverIndex+1) + data.id
+            @trigger "got-id", @id
 
         connectWebRTC: (id) =>
             if !@SupportsWebRTC
@@ -72,7 +79,7 @@ define [
             #@peer.disconnect()
             # Close our the socket.io connection
             @socket.disconnect()
-
+        ###
         sendHeartbeat: =>
             if @lastHeartbeat && @lastHeartbeat < Date.now() - 3000
                 @lastHeartbeat = null
@@ -88,7 +95,7 @@ define [
                 @trigger "ping", (Date.now() - data.time)
                 #Logger.info "Closing connection to peer server..."
                 #if !@peer.disconnected then @peer.destroy()
-
+        ###
 
         send: (data) =>
             if @useWebRTC
@@ -102,11 +109,6 @@ define [
             @trigger "disconnected"
         socketDisconnected: () =>
             Logger.info "Closed socket.io connection."
-
-             # Hack as detailed here: https://github.com/LearnBoost/socket.io-client/issues/251#issuecomment-2589557
-
-            io.j = []
-            io.sockets = []
 
             if !@useWebRTC then @trigger "disconnected"
            
