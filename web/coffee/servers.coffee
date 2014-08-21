@@ -2,10 +2,10 @@ define () ->
     return {
         socketio: [
            #'http://actuallyflaptho.alastair.is:80'
-           'http://localhost:5000/flappyarms'
+           'http://sock.flappyarms.sexy:80/flappyarms'
         ]
         webrtc: [
-            'localhost'
+            {host:'peer.flappyarms.sexy', port:80}
             #'actuallyflaptho.alastair.is'
         ]
     }

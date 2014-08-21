@@ -13,6 +13,8 @@
 
 }
 
+@import "client.less";
+
 html {
   height: 200px;
   overflow: hidden;
@@ -29,6 +31,10 @@ body {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+
+body.client div#server {
+  display: none;
 }
 
 * {
@@ -234,7 +240,7 @@ body.client {
     }
   }
 }
-
+/*
 #client, #client_play {
   display: none;
   color:#000;
@@ -330,7 +336,7 @@ body.touched {
   #client_play {
     color:#fff;
   }
-}
+}*/
 
 #infobutton {
   position: absolute;

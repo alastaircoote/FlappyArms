@@ -20,7 +20,7 @@ define [
             @socket.on 'host-attached', (data) =>
                 @clientId = data.clientId
                 @startPing()
-                @peerClient = new Peer {host: Servers.webrtc, port:5001}
+                @peerClient = new Peer {host: Servers.webrtc[0].host, port:Servers.webrtc[0].port}
                 
                 @dataConnection = @peerClient.connect id, {metadata: {clientId: data.clientId}}
                 @dataConnection.on 'close', =>
@@ -36,7 +36,14 @@ define [
             @socket.on 'event', @receiveSocketEvent
             @on 'pong', @receivePong
 
+        disconnect: =>
+            @socket.emit 'disconnect'
+            @socket.close()
+            if @dataConnection
+                @dataConnection.send {ev:'disconnect'}
+                @dataConnection.close()
 
+            @trigger 'disconnected'
             
 
         receivePong: (time) =>

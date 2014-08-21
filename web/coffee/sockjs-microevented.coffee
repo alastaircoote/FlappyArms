@@ -20,3 +20,6 @@ define ["libs/microevent"], (MicroEvent) ->
                 data: data
 
             @socket.send jsonString
+
+        close: =>
+            @socket.close()

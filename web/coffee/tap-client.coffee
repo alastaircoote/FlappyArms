@@ -1,14 +1,16 @@
-define ["jquery","flap","client-comm"], ($, flap, ClientCommLayer) ->
+define ["jquery","flap","client/player"], ($, flap, Player) ->
     class Client
         isIos: /(iPad|iPod|iPhone)/.test(window.navigator.userAgent)
         constructor: ->
             $("body").addClass("client")
 
             @connectForm = $("#clientsub")
-            @commLayer = new ClientCommLayer()
-            @commLayer.on "receive", @receive
-            @commLayer.on "disconnected", @disconnected
-            @commLayer.on "badserver", () => @noHost()
+            @player = new Player()
+            @player.on 'server-full', @serverFull
+            @player.on 'disonnected', -> window.onbeforeunload = null
+            #@commLayer.on "receive", @receive
+            #@commLayer.on "disconnected", @disconnected
+            #@commLayer.on "badserver", () => @noHost()
             @connectForm.on "submit", @connect
 
             if @isIos
@@ -20,7 +22,7 @@ define ["jquery","flap","client-comm"], ($, flap, ClientCommLayer) ->
                     $('#nums').html ""
 
             @currentNum = ""
-            flap()
+            #flap()
 
             $("body").on "flap", =>
                 console.log "touched", Date.now()
@@ -28,8 +30,8 @@ define ["jquery","flap","client-comm"], ($, flap, ClientCommLayer) ->
 
             # iOS has some weird buggyness where it'll scroll at times. If it does, reset it
             # back again.
-            $(window).on "scroll", ->
-                $(window).scrollTop(0)
+            #$(window).on "scroll", ->
+            #    $(window).scrollTop(0)
 
         connect: (e) =>
             console.log "do connect"
@@ -38,8 +40,21 @@ define ["jquery","flap","client-comm"], ($, flap, ClientCommLayer) ->
             if @isIos
                 val = @currentNum
 
-            @commLayer.connect val
+            @player.connect val
+
+            window.onbeforeunload = () =>
+                @player.disconnect()
+                return 'Are you sure you want to exit the game?'
+
             return
+
+        serverFull: =>
+            alert "Sorry, this game is full."
+            @player.disconnect()
+            $('#codenum').val('')
+            $('#nums').html ""
+            @currentNum = ''
+            $('#nums').focus()
 
         disconnected: () =>
             $("#client_intro").show()

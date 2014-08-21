@@ -50,15 +50,15 @@ define [
                 FakePlayer.connectId = id
 
 
-            @comm.socket.on 'client-attached', @playerAdded
-
+            
 
         playerAdded: ({clientId}) =>
             for player in @players
                 if player.connected then continue
 
                 player.attachSocket clientId
-                break
+                return
+            @comm.send clientId, 'server-full'
 
         playersChosen: (num) =>
             @numOfPlayers = num
@@ -116,6 +116,8 @@ define [
 
         connect: =>
             @comm.connect()
+            @comm.socket.on 'client-attached', @playerAdded
+
 
         playerFlapped: (player) =>
             player.bird.flap()

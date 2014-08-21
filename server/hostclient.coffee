@@ -51,8 +51,8 @@ module.exports = class Host
         @sendToHost 'client-attached',{clientId: id}
         @sendToClient id, "host-attached", {peerId: @peerId, clientId: id}
 
-        clientSocket.on "disconnect", => @disconnected("client")
-        @hostSocket.on "disconnect", => @disconnected("host")
+        clientSocket.on "disconnect", => @sendToHost('disconnected', id)
+        @hostSocket.on "disconnect", => @sendToClient(id,'disconnected')
 
         clientSocket.on "received", (data) => @sendToHost(data.ev, data.data)
         @hostSocket.on "received", (data) => 
